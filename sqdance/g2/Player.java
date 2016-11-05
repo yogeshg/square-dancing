@@ -4,6 +4,7 @@ import sqdance.sim.Point;
 
 import java.io.*;
 import java.util.Random;
+import java.util.List;
 
 public class Player implements sqdance.sim.Player {
 
@@ -39,6 +40,10 @@ public class Player implements sqdance.sim.Player {
     // note the dance caller does not know any player-player relationships, so order doesn't really matter in the Point[] you return. Just make sure your player is consistent with the indexing
 
     public Point[] generate_starting_locations() {
+        return initSquare();
+    }
+
+    public Point[] initStrategy0 (){
         Point[] L  = new Point [d];
         for (int i = 0 ; i < d ; ++i) {
             int b = 1000 * 1000 * 1000;
@@ -124,6 +129,27 @@ public class Player implements sqdance.sim.Player {
         return instructions;
     }
 
+    public Point[] positionsSquare=null;
+
+    public Point[] initSquare() {
+        positionsSquare = new Point[d];
+        int danceSquareSide = (int) Math.ceil( Math.sqrt( d ) );
+        List<Pair> spiral = Looper2D.getSpiral(danceSquareSide, danceSquareSide, false);
+        Pair p = null;
+        for (int i=0; i<d; i++) {
+            p = spiral.get(i);
+            positionsSquare[i] = new Point(p.i, p.j);
+        }
+        // Point[] instructions = new Point[d];
+        return positionsSquare;
+    }
+
+    public Point[] playSquare(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained) {
+        Point[] instructions = new Point[d];
+
+        return instructions;
+    }
+
     // play function
     // dancers: array of locations of the dancers
     // scores: cumulative score of the dancers
@@ -132,7 +158,7 @@ public class Player implements sqdance.sim.Player {
     public Point[] play(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained) {
         Point[] instructions;
         instructions = playUpdateInformation(dancers, scores, partner_ids, enjoyment_gained);
-        instructions = playStrategy0(dancers, scores, partner_ids, enjoyment_gained);
+        instructions = playSquare(dancers, scores, partner_ids, enjoyment_gained);
         return instructions;
     }
 
