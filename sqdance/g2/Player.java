@@ -1,4 +1,4 @@
-package sqdance.g0;
+package sqdance.g2;
 
 import sqdance.sim.Point;
 
@@ -49,16 +49,14 @@ public class Player implements sqdance.sim.Player {
         return L;
     }
 
-    // play function
-    // dancers: array of locations of the dancers
-    // scores: cumulative score of the dancers
-    // partner_ids: index of the current dance partner. -1 if no dance partner
-    // enjoyment_gained: integer amount (-5,0,3,4, or 6) of enjoyment gained in the most recent 6-second interval
-    public Point[] play(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained) {
-        Point[] instructions = new Point[d];
+    // Use this method to update information variables like E
+    // Preserve signature of this function as the same as play()
+    public Point[] playUpdateInformation(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained) {
         for (int i=0; i<d; i++) {
             int j = partner_ids[i];
             Point self = dancers[i];
+
+            // ## Update Variables
             if (enjoyment_gained[i] > 0) { // previously had a dance partner
                 idle_turns[i] = 0;
                 Point dance_partner = dancers[j];
@@ -69,12 +67,28 @@ public class Player implements sqdance.sim.Player {
                 else {
                     E[i][j] -= enjoyment_gained[i];
                 }
+            }
+        }
+        Point[] instructions = null;
+        return instructions;
+    }
+
+    public Point[] playStrategy0(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained) {
+        Point[] instructions = new Point[d];
+        for (int i=0; i<d; i++) {
+            int j = partner_ids[i];
+            Point self = dancers[i];
+
+            // ## Strategy -- same as g0
+            // ### stay put and continue dancing if there is more to enjoy
+            if (enjoyment_gained[i] > 0) { // previously had a dance partner
                 // stay put and continue dancing if there is more to enjoy
                 if (E[i][j] > 0) {
                     instructions[i] = new Point(0.0, 0.0);
                     continue;
                 }
             }
+            // ### stay put if there's another potential dance partner in range
             Point m = null;            
             if (++idle_turns[i] > 21) { // if stuck at current position without enjoying anything
                 idle_turns[i] = 0;
@@ -96,7 +110,7 @@ public class Player implements sqdance.sim.Player {
                     }
                 }
             }
-            // move randomly if no move yet
+            // ### move randomly if no move yet
             if (m == null) {
                 double dir = random.nextDouble() * 2 * Math.PI;
                 double dx = 1.9 * Math.cos(dir);
@@ -107,6 +121,18 @@ public class Player implements sqdance.sim.Player {
             }
             instructions[i] = m;
         }
+        return instructions;
+    }
+
+    // play function
+    // dancers: array of locations of the dancers
+    // scores: cumulative score of the dancers
+    // partner_ids: index of the current dance partner. -1 if no dance partner
+    // enjoyment_gained: integer amount (-5,0,3,4, or 6) of enjoyment gained in the most recent 6-second interval
+    public Point[] play(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained) {
+        Point[] instructions;
+        instructions = playUpdateInformation(dancers, scores, partner_ids, enjoyment_gained);
+        instructions = playStrategy0(dancers, scores, partner_ids, enjoyment_gained);
         return instructions;
     }
 
