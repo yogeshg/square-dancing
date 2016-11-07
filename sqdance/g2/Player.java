@@ -134,7 +134,7 @@ public class Player implements sqdance.sim.Player {
     public Point[] initSquare() {
         positionsSquare = new Point[d];
         int danceSquareSide = (int) Math.ceil( Math.sqrt( d ) );
-        List<Pair> spiral = Looper2D.getSpiral(danceSquareSide, danceSquareSide, false);
+        List<Pair> spiral = Looper2D.getSpiral(danceSquareSide, danceSquareSide, true);
         Pair p = null;
         for (int i=0; i<d; i++) {
             p = spiral.get(i);

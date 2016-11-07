@@ -53,7 +53,7 @@ public class Looper2D {
         return l;
     }
 
-    public static List<Pair> getSpiral( int m, int n, boolean outwards ) {
+    public static List<Pair> getSpiral(int m, int n, boolean outwards ) {
 
         int numLoops = (Math.min(m,n)+1)/2;
         int loop;
@@ -72,13 +72,13 @@ public class Looper2D {
             // 0, 1, 2, 3, .... , ceil(m/2)-1
             loop = looper.next();
 
-            i = (m/2);
+            // i = (m/2);
+            // j = loop;
+            // for(; i > loop; --i) {
+            //     l.add( new Pair(i,j) );
+            // }
+            i = loop;
             j = loop;
-            for(; i > loop; --i) {
-                l.add( new Pair(i,j) );
-            }
-            assert (i == loop);
-            assert (j == loop);
 
             for(; j < (n-1) - loop; ++j) {
                 l.add( new Pair(i,j) );
@@ -94,7 +94,7 @@ public class Looper2D {
             assert (i == (m-1)-loop);
             assert (j == loop);
 
-            for(; i > (m/2)-1; --i) {
+            for(; i > loop ; --i) {
                 l.add( new Pair(i,j) );
             }
         }
@@ -135,44 +135,44 @@ public class Looper2D {
         StringUtil.init(buf, ' ');
 
         // Looper2D l2d = new Looper2D();
-        for( Pair p : Looper2D.getSpiral(5,6,false)) {
+        for( Pair p : Looper2D.getSpiral(8,8,false)) {
             buf[p.i][p.j] = (char)('0'+(counter++)%10);
             // System.out.println( p.toString() );
         }
 
         System.out.println(StringUtil.toString(buf, "\n"));
 
-        StringUtil.init(buf, ' ');
-        counter = 0;
+        // StringUtil.init(buf, ' ');
+        // counter = 0;
 
-        // Looper2D l2d = new Looper2D();
-        for( Pair p : Looper2D.getSpiral(6,5,true)) {
-            buf[p.i][p.j] = (char)('0'+(counter++)%10);
-            // System.out.println( p.toString() );
-        }
+        // // Looper2D l2d = new Looper2D();
+        // for( Pair p : Looper2D.getSpiral(6,5,true)) {
+        //     buf[p.i][p.j] = (char)('0'+(counter++)%10);
+        //     // System.out.println( p.toString() );
+        // }
 
-        System.out.println(StringUtil.toString(buf, "\n"));
+        // System.out.println(StringUtil.toString(buf, "\n"));
 
-        StringUtil.init(buf, ' ');
-        counter = 0;
+        // StringUtil.init(buf, ' ');
+        // counter = 0;
 
-        // Looper2D l2d = new Looper2D();
-        for( Pair p : Looper2D.getCorner(3,6,true)) {
-            buf[p.i][p.j] = (char)('0'+(counter++)%10);
-            // System.out.println( p.toString() );
-        }
+        // // Looper2D l2d = new Looper2D();
+        // for( Pair p : Looper2D.getCorner(3,6,true)) {
+        //     buf[p.i][p.j] = (char)('0'+(counter++)%10);
+        //     // System.out.println( p.toString() );
+        // }
 
-        System.out.println(StringUtil.toString(buf, "\n"));
+        // System.out.println(StringUtil.toString(buf, "\n"));
 
-        StringUtil.init(buf, ' ');
-        counter = 0;
+        // StringUtil.init(buf, ' ');
+        // counter = 0;
 
-        // Looper2D l2d = new Looper2D();
-        for( Pair p : Looper2D.getCorner(6,6,false)) {
-            buf[p.i][p.j] = (char)('0'+(counter++)%10);
-            // System.out.println( p.toString() );
-        }
+        // // Looper2D l2d = new Looper2D();
+        // for( Pair p : Looper2D.getCorner(6,6,false)) {
+        //     buf[p.i][p.j] = (char)('0'+(counter++)%10);
+        //     // System.out.println( p.toString() );
+        // }
 
-        System.out.println(StringUtil.toString(buf, "\n"));
+        // System.out.println(StringUtil.toString(buf, "\n"));
     }
 }
