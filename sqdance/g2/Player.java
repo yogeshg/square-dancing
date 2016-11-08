@@ -132,7 +132,7 @@ public class Player implements sqdance.sim.Player {
     public Point[] positionsSquare=null;
 
     double DIST_PAIRS = 2.0;
-    double DIST_DANCERS = 0.00;
+    double DIST_DANCERS = 1.2;
 
     public Point[] initSquare() {
         positionsSquare = new Point[d];
@@ -156,7 +156,9 @@ public class Player implements sqdance.sim.Player {
 
     public Point[] playSquare(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained) {
         Point[] instructions = new Point[d];
-
+        for(int i = 0 ; i < d ; ++i) {
+        	instructions[i]  = new Point(0,0);
+        }
         return instructions;
     }
 
