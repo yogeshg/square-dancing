@@ -28,7 +28,7 @@ class Simulator {
     public static void main(String[] args)
     {
 	int friends = 10;
-	int participants = 88;
+	int participants = 22;
 	boolean verbose = false;
 	int room_side = 20;
 	int turns = 1800;
@@ -37,7 +37,7 @@ class Simulator {
 	String[] groups = null;
 	PrintStream out = null;
 	Class <Player> player_class = null;
-	String group = "g0";
+	String group = "g2";
 	try {
 	    for (int a = 0 ; a != args.length ; ++a)
 		if (args[a].equals("-f") || args[a].equals("--friends")) {
