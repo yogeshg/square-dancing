@@ -1,14 +1,11 @@
 package sqdance.g2;
 
-import java.util.Iterator;
 import java.lang.Math;
 import java.util.*;
 
-public class Looper2D {
-    // public enum Type {SPIRAL, CORNERS};
+import sqdance.sim.Point;
 
-    // public Type type; 
-    // public int size; // Ideally this should m, n
+public class Looper2D {
 
     /*
      * Note: has not actually been tested with m != n so using with such settings
@@ -131,8 +128,54 @@ public class Looper2D {
 
         return l;
     }
+    
+    public static List<Point> getCentersBetweenDancers(int m, int n) {
+    	double DISTANCE_BETWEEN_CENTERS = 0.5001;
+    	
+    	List<Point> centers = new LinkedList<>();
+    	
+    	double currentX = m/2.0;
+    	double currentY = n/2.0;
+    	
+    	int currentState = 0;
+    	Point[] stateIncrement = {new Point(0,-DISTANCE_BETWEEN_CENTERS),
+    						      new Point(DISTANCE_BETWEEN_CENTERS,0),
+    						      new Point(0,DISTANCE_BETWEEN_CENTERS),
+    						      new Point(-DISTANCE_BETWEEN_CENTERS,0)};
+    	int numCentersInState = 1;
+    	
+    	while (currentX >= 0 && currentY >= 0 && currentX < m && currentY < n) {
+    		for (int i = 0; i < numCentersInState; ++i) {
+    			centers.add(new Point(currentX, currentY));
+    			currentX += stateIncrement[currentState].x;
+    			currentY += stateIncrement[currentState].y;
+    			if (!(currentX >= 0 && currentY >= 0 && currentX < m && currentY < n)) {
+    				// Out of bounds
+    				break;
+    			}
+    		}
+    		
+    		/*
+    		 *  Corner adjustments
+    		 *  1. Move extra half distance
+    		 *  2. Change state
+    		 *  3. Move half distance in new state
+    		 */
+    		currentX += stateIncrement[currentState].x / 2;
+			currentY += stateIncrement[currentState].y / 2;
+    		currentState = (currentState + 1) % stateIncrement.length;
+    		currentX += stateIncrement[currentState].x / 2;
+			currentY += stateIncrement[currentState].y / 2;
+			numCentersInState++;
+    	}
+    	
+    	return centers;
+    }
+    
 
     public static void main(String[] args) {
+    	
+    	testCOMLine(5,5);
 
         int counter = 0;
         char [][] buf = new char[10][10];
@@ -179,4 +222,10 @@ public class Looper2D {
 
         // System.out.println(StringUtil.toString(buf, "\n"));
     }
+
+	private static void testCOMLine(int i, int j) {
+		List<Point> centers = getCentersBetweenDancers(i, j);
+		for (Point center : centers)
+			System.out.println("(" + center.x + ", " + center.y + ")");
+	}
 }

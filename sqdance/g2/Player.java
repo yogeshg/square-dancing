@@ -37,10 +37,23 @@ public class Player implements sqdance.sim.Player {
     }
 
     // setup function called once to generate initial player locations
-    // note the dance caller does not know any player-player relationships, so order doesn't really matter in the Point[] you return. Just make sure your player is consistent with the indexing
-
+    // note the dance caller does not know any player-player relationships, 
+    // so order doesn't really matter in the Point[] you return. 
+    // Just make sure your player is consistent with the indexing
     public Point[] generate_starting_locations() {
         return initSquare();
+    }
+    
+    // play function
+    // dancers: array of locations of the dancers
+    // scores: cumulative score of the dancers
+    // partner_ids: index of the current dance partner. -1 if no dance partner
+    // enjoyment_gained: integer amount (-5,0,3,4, or 6) of enjoyment gained in the most recent 6-second interval
+    public Point[] play(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained) {
+        Point[] instructions;
+        instructions = playUpdateInformation(dancers, scores, partner_ids, enjoyment_gained);
+        instructions = playSquare(dancers, scores, partner_ids, enjoyment_gained);
+        return instructions;
     }
 
     public Point[] initStrategy0 (){
@@ -159,18 +172,6 @@ public class Player implements sqdance.sim.Player {
         for(int i = 0 ; i < d ; ++i) {
         	instructions[i]  = new Point(0,0);
         }
-        return instructions;
-    }
-
-    // play function
-    // dancers: array of locations of the dancers
-    // scores: cumulative score of the dancers
-    // partner_ids: index of the current dance partner. -1 if no dance partner
-    // enjoyment_gained: integer amount (-5,0,3,4, or 6) of enjoyment gained in the most recent 6-second interval
-    public Point[] play(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained) {
-        Point[] instructions;
-        instructions = playUpdateInformation(dancers, scores, partner_ids, enjoyment_gained);
-        instructions = playSquare(dancers, scores, partner_ids, enjoyment_gained);
         return instructions;
     }
 
