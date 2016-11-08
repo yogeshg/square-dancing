@@ -13,12 +13,16 @@ public class SquareSpiralStrategy {
 	public static Point[] init() {
 		int d = Player.d;
         positionsSquare = new Point[d];
-        int danceSquareSide = (int) Math.ceil( Math.sqrt( d ) );
+        int danceSquareSide = (int) Math.ceil( Math.sqrt( (d)) );
         List<Vector> spiral = Looper2D.getCentersBetweenDancers(danceSquareSide, danceSquareSide);
+        Vector TRANSLATE = null;
         Vector p = null;
         for (int i=0; i<d/2; i++) {
             p = spiral.get(i);
-            positionsSquare[d-i-1] = positionsSquare[i] = p.multiply(DIST_PAIRS).getPoint();
+            if( 0==i ) {
+                TRANSLATE = new Vector( (Player.room_side/2)-p.multiply(DIST_PAIRS).x, (Player.room_side/2)-p.multiply(DIST_PAIRS).y );
+            }
+            positionsSquare[d-i-1] = positionsSquare[i] = p.multiply(DIST_PAIRS).add(TRANSLATE).getPoint();
             if( p.state==1 || p.state==3 ) {
                 positionsSquare[i] = new Point(positionsSquare[i].x,positionsSquare[i].y+DIST_DANCERS/2);
                 positionsSquare[d-i-1] = new Point(positionsSquare[d-i-1].x,positionsSquare[i].y-DIST_DANCERS/2);
