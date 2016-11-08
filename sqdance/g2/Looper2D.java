@@ -82,20 +82,24 @@ public class Looper2D {
 
             for(; j < (n-1) - loop; ++j) {
                 l.add( new Pair(i,j) );
+                l.get(l.size()-1).state = 1;
             }   // Traverse all in the top row
 
             for(; i < (m-1) - loop; ++i) {
                 l.add( new Pair(i,j) );
+                l.get(l.size()-1).state = 2;
             }   // Traverse all in the left column
 
             for(; j > loop; --j) {
                 l.add( new Pair(i,j) );
+                l.get(l.size()-1).state = 3;
             }
             assert (i == (m-1)-loop);
             assert (j == loop);
 
             for(; i > loop ; --i) {
                 l.add( new Pair(i,j) );
+                l.get(l.size()-1).state = 4;
             }
         }
 

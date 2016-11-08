@@ -2,6 +2,7 @@ package sqdance.g2;
 
 public class Pair {
     public int i, j;
+    public int state;
     public Pair() {
         this(0,0);
     }
@@ -12,8 +13,12 @@ public class Pair {
         this(1+h[1].i-h[0].i, 1+h[1].j-h[0].j);
     }
     public Pair(int x, int y) {
+        this(x,y,0);
+    }
+    public Pair(int x, int y, int s) {
         i = x;
         j = y;
+        state = s;
     }
 
     // public Pair(Cell c) {
