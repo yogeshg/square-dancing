@@ -11,7 +11,9 @@ public class Player implements sqdance.sim.Player {
     // remainingEnjoyment[i][j]: the remaining enjoyment player j can give player i
     // -1 if the value is unknown (everything unknown upon initialization)
     private int[][] remainingEnjoyment = null;
-
+    
+    //s soulmate, f friend, x stranger
+    private char[][] relation = null;
     // random generator
     private Random random = null;
 
@@ -26,6 +28,7 @@ public class Player implements sqdance.sim.Player {
         this.room_side = (double) room_side;
         random = new Random();
         remainingEnjoyment = new int [d][d];
+        relation = new char[d][d];
         idle_turns = new int[d];
         for (int i=0 ; i<d ; i++) {
             idle_turns[i] = 0;
@@ -79,12 +82,23 @@ public class Player implements sqdance.sim.Player {
                 else {
                     remainingEnjoyment[i][j] -= enjoyment_gained[i];
                 }
+                relation[i][j] 
+                		= relation[j][i] 
+                		= getRelation(enjoyment_gained[i]);
             }
         }
         
         return null;
     }
 
+    private char getRelation(int enjoyment) {
+    	switch (enjoyment) {
+        case 3: return 'x'; // stranger
+        case 4: return 'f'; // friend
+        case 6: return 's'; // soulmate
+        default: throw new IllegalArgumentException("Not dancing with anyone...");
+    }      
+    }
     private int total_enjoyment(int enjoyment_gained) {
         switch (enjoyment_gained) {
             case 3: return 60; // stranger
