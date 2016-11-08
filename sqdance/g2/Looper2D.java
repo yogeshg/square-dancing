@@ -3,8 +3,6 @@ package sqdance.g2;
 import java.lang.Math;
 import java.util.*;
 
-import sqdance.sim.Point;
-
 public class Looper2D {
 
     /*
@@ -129,24 +127,27 @@ public class Looper2D {
         return l;
     }
     
-    public static List<Point> getCentersBetweenDancers(int m, int n) {
+    public static List<Vector> getCentersBetweenDancers(int m, int n) {
     	double DISTANCE_BETWEEN_CENTERS = 0.5001;
     	
-    	List<Point> centers = new LinkedList<>();
+    	List<Vector> centers = new LinkedList<>();
+        Vector center = null;
     	
     	double currentX = m/2.0;
     	double currentY = n/2.0;
     	
     	int currentState = 0;
-    	Point[] stateIncrement = {new Point(0,-DISTANCE_BETWEEN_CENTERS),
-    						      new Point(DISTANCE_BETWEEN_CENTERS,0),
-    						      new Point(0,DISTANCE_BETWEEN_CENTERS),
-    						      new Point(-DISTANCE_BETWEEN_CENTERS,0)};
+    	Vector[] stateIncrement = {new Vector(0,-DISTANCE_BETWEEN_CENTERS),
+    						      new Vector(DISTANCE_BETWEEN_CENTERS,0),
+    						      new Vector(0,DISTANCE_BETWEEN_CENTERS),
+    						      new Vector(-DISTANCE_BETWEEN_CENTERS,0)};
     	int numCentersInState = 1;
     	
     	while (currentX >= 0 && currentY >= 0 && currentX < m && currentY < n) {
     		for (int i = 0; i < numCentersInState; ++i) {
-    			centers.add(new Point(currentX, currentY));
+                center = new Vector(currentX, currentY);
+                center.state = currentState;
+    			centers.add(center);
     			currentX += stateIncrement[currentState].x;
     			currentY += stateIncrement[currentState].y;
     			if (!(currentX >= 0 && currentY >= 0 && currentX < m && currentY < n)) {
@@ -224,8 +225,8 @@ public class Looper2D {
     }
 
 	private static void testCOMLine(int i, int j) {
-		List<Point> centers = getCentersBetweenDancers(i, j);
-		for (Point center : centers)
+		List<Vector> centers = getCentersBetweenDancers(i, j);
+		for (Vector center : centers)
 			System.out.println("(" + center.x + ", " + center.y + ")");
 	}
 }

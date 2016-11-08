@@ -6,6 +6,8 @@ public class Vector extends Point {
 
     // double x;
     // double y;
+    public
+    int state;
 
     final double EPSILON = 1e-7;
 
