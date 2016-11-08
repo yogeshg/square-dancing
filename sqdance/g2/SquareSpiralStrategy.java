@@ -7,8 +7,8 @@ import sqdance.sim.Point;
 public class SquareSpiralStrategy {
     public static Point[] positionsSquare = null;
 
-    static double DIST_PAIRS = 2.0;
-    static double DIST_DANCERS = 1.2;
+    static double DIST_PAIRS = 1.2;
+    static double DIST_DANCERS = 1.1;
 
 	public static Point[] init() {
 		int d = Player.d;
@@ -31,11 +31,32 @@ public class SquareSpiralStrategy {
         return positionsSquare;
     }
 
-    public static Point[] move(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained) {
+    public static Point[] move(Point[] dancers,
+    		int[] scores, 
+    		int[] partner_ids, 
+    		int[] enjoyment_gained,
+    		int[][] remainingEnjoyment) {
     	int d = Player.d;
         Point[] instructions = new Point[d];
+        
+        //only move when i and j!=i cannot dance any more
+        int sad_dancers = 0;
         for(int i = 0 ; i < d ; ++i) {
-        	instructions[i]  = new Point(0,0);
+        	int j = partner_ids[i];
+        	if(i!=j && remainingEnjoyment[i][j] == 0)
+        		sad_dancers ++ ;
+        }
+        for(int i = 0 ; i < d ; ++i) {
+        	int next_i = i;
+        	if(sad_dancers == 0)
+        		next_i = i;
+        	else 
+        		next_i = (i==d-1?0:i+1);
+        	instructions[i] = 
+        			new Vector(dancers[next_i].x - dancers[i].x,
+        					dancers[next_i].y - dancers[i].y)
+        			.getLengthLimitedVector(2)
+        			.getPoint();
         }
         return instructions;
     }

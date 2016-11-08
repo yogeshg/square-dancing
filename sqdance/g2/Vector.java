@@ -36,6 +36,21 @@ public class Vector extends Point {
         return new Vector(x+b.x, y+b.y);
     }
 
+    public Vector getUnitVector() {
+    	return getLengthLimitedVector(1);
+    }
+    public Vector getLengthLimitedVector(double l) {
+    	double x = this.x,
+    			y = this.y;
+    	double norm = Math.hypot(x, y);
+    	if(norm <= l) {
+    		return new Vector(x,y);
+    	}
+    	x /= norm/l;
+    	y /= norm/l;
+		
+    	return new Vector(x, y);
+    }
     // public Vector unitVector() {
     //     final double t = norm();
     //     if (t < EPSILON){
