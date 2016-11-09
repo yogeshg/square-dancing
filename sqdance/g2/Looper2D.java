@@ -127,7 +127,7 @@ public class Looper2D {
         return l;
     }
     
-    public static List<Vector> getCentersBetweenDancers(int m, int n) {
+    public static List<Vector> getCentersBetweenDancers(double m, double n) {
     	double DISTANCE_BETWEEN_CENTERS = 0.5001;
     	
     	List<Vector> centers = new LinkedList<>();
