@@ -1,6 +1,7 @@
 package sqdance.g2;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import sqdance.sim.Point;
 
@@ -20,7 +21,7 @@ public class SquareSpiralStrategy {
         
         //need d+2 to get an extra point
         int danceSquareSide = (int) Math.ceil( Math.sqrt( (d + 2)) );
-        List<Vector> spiral = Looper2D.getCentersBetweenDancers(danceSquareSide, danceSquareSide);
+        List<Vector> spiral = Looper2D.getCentersBetweenDancers(danceSquareSide*2, 2*danceSquareSide);
         Vector TRANSLATE = null;
         Vector p = null;
         for (int i=0; i<d/2; i++) {
@@ -51,7 +52,8 @@ public class SquareSpiralStrategy {
     		int[] partner_ids, 
     		int[] enjoyment_gained,
     		int[][] remainingEnjoyment,
-    		char[][] relation) {
+    		char[][] relation,
+    		int[] soulmate) {
     	int d = Player.d;
         
         
@@ -70,6 +72,41 @@ public class SquareSpiralStrategy {
             		remainingEnjoyment);
         }
         
+        boolean finished = false;
+        if(num_rounds >= d) {
+        	finished = true;
+        }
+        
+        if(finished && stage == 1) {
+        	//calc_soulmates(relation, soulmate);
+        	//stage = 2;
+        }
+        if(finished && stage == 2) {
+        	Point[] instructions = new Point[d];
+        	int ind = 0;
+        	for(int i = 0 ; i < d ; ++ i) {
+            	Vector newpos = new Vector(0,0);
+        		int cur  = i;
+            	int j = soulmate[i];
+            	if(j < cur) {
+        			continue;
+            	} else {
+            		int x = ind%100;
+            		int y = ind/100;
+            		instructions[i] = new Vector(x - dancers[i].x, 
+            				y - dancers[i].y)
+            				.getLengthLimitedVector(2)
+            				.getPoint();
+            		instructions[j] = new Vector(x + 0.51 - dancers[j].x, 
+            				y - dancers[j].y)
+            				.getLengthLimitedVector(2)
+            				.getPoint();
+        			++ind;
+            	}
+            	
+        	}
+        	return instructions;
+        }
         //move i to next[i]
     	return move_to_next(dancers,
         		scores, 
@@ -80,6 +117,25 @@ public class SquareSpiralStrategy {
         
     }
 
+    //assumes filled or only one not found
+    private static void calc_soulmates(char[][] relation, int[] soulmate) {
+    	List<Integer> left = new ArrayList<Integer>();
+    	int d = Player.d;
+    	for(int i = 0 ; i < d ; ++ i) {
+    		if(soulmate[i]==-1) {
+    			left.add(i);
+    		}
+    	}
+    	if(left.size()==0) return;
+    	
+    	if(left.size() > 2) {
+    	//	throw new Exception e(".a.a.");
+    		//System.err.println("calc soulmates fail");
+    		return;
+    	}
+    	soulmate[left.get(0)] = left.get(1);
+    	soulmate[left.get(1)] = left.get(0);
+    }
     private static Point[] init_second_stage(Point[] dancers,
     		int[] scores, 
     		int[] partner_ids, 
