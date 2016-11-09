@@ -6,14 +6,20 @@ import sqdance.sim.Point;
 
 public class SquareSpiralStrategy {
     public static Point[] positionsSquare = null;
-
+    static int[] next = null;
     static double DIST_PAIRS = 1.5;
     static double DIST_DANCERS = 1.001;
-
+    static int stage = 0;
+    static int num_rounds = 0;
+    static Vector extra_point = null;
+    
 	public static Point[] init() {
 		int d = Player.d;
+		next = new int[d];
         positionsSquare = new Point[d];
-        int danceSquareSide = (int) Math.ceil( Math.sqrt( (d)) );
+        
+        //need d+2 to get an extra point
+        int danceSquareSide = (int) Math.ceil( Math.sqrt( (d + 2)) );
         List<Vector> spiral = Looper2D.getCentersBetweenDancers(danceSquareSide, danceSquareSide);
         Vector TRANSLATE = null;
         Vector p = null;
@@ -31,6 +37,11 @@ public class SquareSpiralStrategy {
                 positionsSquare[d-i-1] = new Point(positionsSquare[i].x-DIST_DANCERS/2, positionsSquare[d-i-1].y);
             }
         }
+        System.out.println(spiral.size());
+        extra_point = spiral.get(d/2);
+        
+        for(int i = 0 ; i < d; ++i) next[i] = i+1;
+        next[d-1] = 0;
         // Point[] instructions = new Point[d];
         return positionsSquare;
     }
@@ -39,23 +50,96 @@ public class SquareSpiralStrategy {
     		int[] scores, 
     		int[] partner_ids, 
     		int[] enjoyment_gained,
-    		int[][] remainingEnjoyment) {
+    		int[][] remainingEnjoyment,
+    		char[][] relation) {
     	int d = Player.d;
-        Point[] instructions = new Point[d];
         
-        //only move when i and j!=i cannot dance any more
+        
+        boolean finished_half = false;
+        if(num_rounds >= d/2) {
+        	finished_half = true;
+        }
+        
+        if(stage == 0 && finished_half) {
+        	stage = 1;
+        	//switch i and i+1 for i < d
+        	return init_second_stage(dancers,
+            		scores, 
+            		partner_ids, 
+            		enjoyment_gained,
+            		remainingEnjoyment);
+        }
+        
+        //move i to next[i]
+    	return move_to_next(dancers,
+        		scores, 
+        		partner_ids, 
+        		enjoyment_gained,
+        		remainingEnjoyment);
+    
+        
+    }
+
+    private static Point[] init_second_stage(Point[] dancers,
+    		int[] scores, 
+    		int[] partner_ids, 
+    		int[] enjoyment_gained,
+    		int[][] remainingEnjoyment){
+    	//stage = 0;
+    	//if(true) return null;
+    	int d = Player.d;
+    	Point[] instructions = new Point[d];
+        for(int i = 0 ; i < d ; ++i) {
+        	
+        	Vector newp = extra_point;
+        	int next_i = (i < d/2 - 1 || i==d-1)?
+        					(i==d-1)?
+        						(0)
+        						:(i+1)
+        					:(i==d/2 - 1)?
+        						(-1)
+        						:(i);
+        	if(next_i == -1) {
+        		instructions[i] = new Vector((newp.x - dancers[i].x),
+        							(newp.y - dancers[i].y))
+        				.getLengthLimitedVector(1.5)
+        				.getPoint();
+        	} else						
+        		instructions[i] = 
+        			new Vector(dancers[next_i].x - dancers[i].x,
+        					dancers[next_i].y - dancers[i].y)
+        			.getLengthLimitedVector(2)
+        			.getPoint();
+        }
+        return instructions;
+    }
+    
+    
+    private static Point[] move_to_next(Point[] dancers,
+    		int[] scores, 
+    		int[] partner_ids, 
+    		int[] enjoyment_gained,
+    		int[][] remainingEnjoyment){
+    	System.out.println("round: " + num_rounds);
+    	int d = Player.d;
+    	Point[] instructions = new Point[d];
+    	//only move when i and j!=i cannot dance any more
         int sad_dancers = 0;
         for(int i = 0 ; i < d ; ++i) {
         	int j = partner_ids[i];
         	if(i!=j && remainingEnjoyment[i][j] == 0)
         		sad_dancers ++ ;
+        	System.out.println(i + " with " + j);
         }
+        if(sad_dancers != 0) 
+        	++ num_rounds;
         for(int i = 0 ; i < d ; ++i) {
         	int next_i = i;
-        	if(sad_dancers == 0)
+        	if((sad_dancers == 0 && stage == 0)
+            		|| (stage == 1 && sad_dancers < 3))
         		next_i = i;
         	else 
-        		next_i = (i==d-1?0:i+1);
+        		next_i = next[i];
         	instructions[i] = 
         			new Vector(dancers[next_i].x - dancers[i].x,
         					dancers[next_i].y - dancers[i].y)

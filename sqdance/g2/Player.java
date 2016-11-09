@@ -49,7 +49,8 @@ public class Player implements sqdance.sim.Player {
         		scores,
         		partner_ids,
         		enjoyment_gained,
-        		remainingEnjoyment);
+        		remainingEnjoyment,
+        		relation);
         return instructions;
     }
 
