@@ -15,6 +15,7 @@ public class Player implements sqdance.sim.Player {
     //s soulmate, f friend, x stranger
     private char[][] relation = null;
     
+
     private int[] soulmate = null;
     // random generator
     private Random random = null;
@@ -22,8 +23,13 @@ public class Player implements sqdance.sim.Player {
     // simulation parameters
     static int d = -1;
     static double room_side = -1;
+    
+    // Threshold values for d, TODO tune these
+    int d1 = 200, d2 = 400;
 
     private int[] idle_turns;
+    
+    Strategy strategy;
 
     public void init(int d, int room_side) {
         this.d = d;
@@ -40,6 +46,12 @@ public class Player implements sqdance.sim.Player {
                 remainingEnjoyment[i][j] = i == j ? 0 : -1;
             }
         }
+        
+        // Deciding strategy based on number of dancers
+        // TODO Change these to corresponding strategy
+        if (d <= d1) strategy = new ZigZagStrategySmall();
+        else if (d <= d2) strategy = new ZigZagStrategyMedium();
+        else strategy = new ZigZagStrategySmall();
     }
 
     public Point[] generate_starting_locations() {
@@ -56,18 +68,9 @@ public class Player implements sqdance.sim.Player {
         		remainingEnjoyment,
         		relation,
         		soulmate);
-        return instructions;
-    }
+        instructions = strategy.play(dancers, scores, partner_ids, enjoyment_gained);
 
-    public Point[] initStrategy0() {
-        Point[] L  = new Point [d];
-        for (int i = 0 ; i < d ; ++i) {
-            int b = 1000 * 1000 * 1000;
-            double x = random.nextInt(b + 1) * room_side / b;
-            double y = random.nextInt(b + 1) * room_side / b;
-            L[i] = new Point(x, y);
-        }        
-        return L;
+        return instructions;
     }
 
     // Use this method to update information variables like remainingEnjoyment
@@ -77,10 +80,11 @@ public class Player implements sqdance.sim.Player {
             int j = partner_ids[i];
             Point self = dancers[i];
 
-            // ## Update Variables
+            // Update Variables
             if (enjoyment_gained[i] > 0) { // previously had a dance partner
                 idle_turns[i] = 0;
                 Point dance_partner = dancers[j];
+                
                 // update remaining available enjoyment
                 if (remainingEnjoyment[i][j] == -1 ) {
                     remainingEnjoyment[i][j] = total_enjoyment(enjoyment_gained[i]) - enjoyment_gained[i];
@@ -88,7 +92,7 @@ public class Player implements sqdance.sim.Player {
                 else {
                     remainingEnjoyment[i][j] -= enjoyment_gained[i];
                 }
-                relation[i][j] 
+                relation[i][j]
                 		= relation[j][i] 
                 		= getRelation(enjoyment_gained[i]);
                 if(relation[i][j]=='s') {
