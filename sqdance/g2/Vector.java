@@ -37,7 +37,9 @@ public class Vector extends Point {
     public Vector add(Point b) {
         return new Vector(x+b.x, y+b.y);
     }
-
+    public Vector add(double x, double y) {
+    	return new Vector(this.x + x, this.y + y);
+    }
     public Vector getUnitVector() {
     	return getLengthLimitedVector(1);
     }
