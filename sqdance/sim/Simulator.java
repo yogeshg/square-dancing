@@ -23,7 +23,7 @@ class Simulator {
     
     // time limits
     private static final int init_timeout = 1000000;
-    private static final int play_timeout = 1000;
+    private static final int play_timeout = 100000;
 
     public static void main(String[] args)
     {
