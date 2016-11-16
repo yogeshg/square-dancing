@@ -4,6 +4,8 @@ import sqdance.sim.Point;
 
 public class ZigZagStrategySmall implements Strategy {
 	private static final double EPSILON = 0.00001;
+	
+	//ToDo: Set actual number (how many dancers are in each row)
 	private static final int DANCERS_IN_A_LINE = 20;
 	private int num_swaps;
 	@Override
@@ -11,6 +13,8 @@ public class ZigZagStrategySmall implements Strategy {
 		num_swaps = 0;
 		return null;
 	}
+	
+	//ToDo: data structure access and update
 	private int getXfromLocation(int i) {
 		return 0;
 	}
