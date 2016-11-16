@@ -20,9 +20,9 @@ public class SquareSpiralStrategy {
         positionsSquare = new Point[d];
         
         //need d+2 to get an extra point
-        int danceSquareSide = (int) Math.ceil( Math.sqrt( (d + 2)) );
-        List<Vector> spiral = Looper2D.getCentersBetweenDancers(danceSquareSide*2, 2*danceSquareSide);
         double danceSquareSide = Player.room_side;
+        List<Vector> spiral = Looper2D.getCentersBetweenDancers(danceSquareSide, danceSquareSide);
+        
         Vector TRANSLATE = null;
         Vector p = null;
         for (int i=0; i<d/2; i++) {
