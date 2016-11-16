@@ -64,8 +64,9 @@ public class ZigZagStrategySmall implements Strategy {
 		return dancer_at_point.get(i);
 	}
 	
-	private void updateLocations(int i, Point instruction) {
-		
+	private void updateLocations(int i, Point new_location, int new_id) {
+		final_positions[i] = new Point( new_location.x, new_location.y);
+		dancer_at_point.put(i, new_id);
 	}
 	
     public Point[] playSmallD(Point[] dancers,
@@ -111,6 +112,7 @@ public class ZigZagStrategySmall implements Strategy {
     				instructions[i] = new Point(0,0);
     			}
     		} else {
+    			int[] new_id = new int[d];
     			//swap
 				for(int i = 0; i < d; i ++) {
 					
@@ -123,11 +125,12 @@ public class ZigZagStrategySmall implements Strategy {
 					else {
 						if(i == 0 || i == d-1) {
 							instructions[i] = new Point(0, 0);
+							new_id[i] = id1;
 							continue;
 						}
 						next = (i % 2 == 0 ? i - 1 : i + 1);
 					}
-					
+					new_id[i] = next;
 					double x2 = getXfromLocation(next);
 					double y2 = getYfromLocation(next);
 					int id2 = getIDfromLocation(next);
@@ -156,10 +159,15 @@ public class ZigZagStrategySmall implements Strategy {
     				
     			}
     			++ num_swaps;
+
+    	    	for(int i = 0; i < d; ++i) {
+    	    		int next = new_id[i];
+    	    		Point new_location = 
+    	    				new Point(instructions[next].x + dancers[next].x,
+    	    						instructions[next].y + dancers[next].y);
+    	    		updateLocations(i, new_location,new_id[i]);
+    	    	}
     		}
-    	}
-    	for(int i = 0; i < d; ++i) {
-    		updateLocations(i, instructions[i]);
     	}
     	return instructions;
     }
