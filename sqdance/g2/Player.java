@@ -69,14 +69,7 @@ public class Player implements sqdance.sim.Player {
     public Point[] play(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained) {
         Point[] instructions;
         playUpdateInformation(dancers, scores, partner_ids, enjoyment_gained);
-        instructions = SquareSpiralStrategy.move(dancers,
-        		scores,
-        		partner_ids,
-        		enjoyment_gained,
-        		remainingEnjoyment,
-        		relation,
-        		soulmate);
-        instructions = strategy.play(dancers, scores, partner_ids, enjoyment_gained);
+        instructions = strategy.play(dancers, scores, partner_ids, enjoyment_gained, soulmate, total_turns-1);
 
         return instructions;
     }

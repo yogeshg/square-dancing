@@ -10,7 +10,9 @@ public class ZigZagStrategyMedium implements Strategy {
 	}
 
 	@Override
-	public Point[] play(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained) {
+	public Point[] play(Point[] dancers, int[] scores,
+			int[] partner_ids, int[] enjoyment_gained,
+			int[] soulmate, int current_turn){
 		return null;
 	}
 }

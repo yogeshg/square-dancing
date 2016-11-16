@@ -172,23 +172,13 @@ public class ZigZagStrategySmall implements Strategy {
     	return instructions;
     }
     
-    @Override
-	public Point[] play(Point[] dancers, int[] scores,
-			int[] partner_ids, int[] enjoyment_gained) {
-    	return null;
-    }
-    
     //increment current turn after everyone is done dancing with strangers/friends
     //for medium d
     //for small d just increment it every turn
+    @Override
 	public Point[] play(Point[] dancers, int[] scores,
 			int[] partner_ids, int[] enjoyment_gained,
 			int[] soulmate, int current_turn) {
-		return playSmallD(dancers,
-	    		scores,
-	    		partner_ids,
-	    		enjoyment_gained,
-	    		soulmate,
-	    		current_turn);
+		return playSmallD(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn);
 	}
 }
