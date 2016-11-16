@@ -16,7 +16,7 @@ public class Player implements sqdance.sim.Player {
     private char[][] relation = null;
     
 
-    private int[] soulmate = null;
+    public int[] soulmate = null;
     // random generator
     private Random random = null;
 
@@ -31,7 +31,7 @@ public class Player implements sqdance.sim.Player {
     int f_estimate;
     int friend_pairs_seen;
     
-    int total_turns;
+    public int total_turns;
     private int[] idle_turns;
     
     Strategy strategy;
@@ -69,14 +69,16 @@ public class Player implements sqdance.sim.Player {
     public Point[] play(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained) {
         Point[] instructions;
         playUpdateInformation(dancers, scores, partner_ids, enjoyment_gained);
-        instructions = SquareSpiralStrategy.move(dancers,
+        /*instructions = SquareSpiralStrategy.move(dancers,
         		scores,
         		partner_ids,
         		enjoyment_gained,
         		remainingEnjoyment,
         		relation,
-        		soulmate);
-        instructions = strategy.play(dancers, scores, partner_ids, enjoyment_gained);
+        		soulmate);*/
+        instructions = strategy.play(dancers, 
+        		scores, partner_ids, enjoyment_gained,
+        		soulmate, total_turns);
 
         return instructions;
     }
