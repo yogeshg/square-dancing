@@ -63,7 +63,7 @@ public class Player implements sqdance.sim.Player {
     }
 
     public Point[] generate_starting_locations() {
-        return SquareSpiralStrategy.init();
+        return strategy.generate_starting_locations();
     }
     
     public Point[] play(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained) {
@@ -122,18 +122,20 @@ public class Player implements sqdance.sim.Player {
 
     private char getRelation(int enjoyment) {
     	switch (enjoyment) {
-        case 3: return 'x'; // stranger
-        case 4: return 'f'; // friend
-        case 6: return 's'; // soulmate
-        default: throw new IllegalArgumentException("Not dancing with anyone...");
-    }      
+	        case 3: return 'x'; // stranger
+	        case 4: return 'f'; // friend
+	        case 6: return 's'; // soulmate
+    	}
+    	
+    	return 0;
     }
     private int total_enjoyment(int enjoyment_gained) {
         switch (enjoyment_gained) {
             case 3: return 60; // stranger
             case 4: return 200; // friend
             case 6: return 10800; // soulmate
-            default: throw new IllegalArgumentException("Not dancing with anyone...");
-        }        
+        }
+        
+        return 0;
     }
 }

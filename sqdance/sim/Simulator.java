@@ -22,7 +22,7 @@ class Simulator {
     private static final double personal_bubble = 0.1;
     
     // time limits
-    private static final int init_timeout = 10000;
+    private static final int init_timeout = 1000000;
     private static final int play_timeout = 1000;
 
     public static void main(String[] args)
@@ -37,7 +37,7 @@ class Simulator {
 	String[] groups = null;
 	PrintStream out = null;
 	Class <Player> player_class = null;
-	String group = "g0";
+	String group = "g2";
 	try {
 	    for (int a = 0 ; a != args.length ; ++a)
 		if (args[a].equals("-f") || args[a].equals("--friends")) {
