@@ -25,8 +25,13 @@ public class Player implements sqdance.sim.Player {
     static double room_side = -1;
     
     // Threshold values for d, TODO tune these
-    int d1 = 200, d2 = 400;
-
+    static int d1 = 200, d2 = 400;
+    
+    // Estimated value of f from number of dancing pairs that are friends
+    int f_estimate;
+    int friend_pairs_seen;
+    
+    int total_turns;
     private int[] idle_turns;
     
     Strategy strategy;
@@ -34,12 +39,15 @@ public class Player implements sqdance.sim.Player {
     public void init(int d, int room_side) {
         this.d = d;
         this.room_side = (double) room_side;
+        total_turns = 0;
         soulmate = new int[d];
         for(int i = 0 ; i < d ; ++ i) soulmate[i] = -1;
         random = new Random();
         remainingEnjoyment = new int [d][d];
         relation = new char[d][d];
         idle_turns = new int[d];
+        f_estimate = 0;
+        friend_pairs_seen = 0;
         for (int i=0 ; i<d ; i++) {
             idle_turns[i] = 0;
             for (int j=0; j<d; j++) {
@@ -79,11 +87,11 @@ public class Player implements sqdance.sim.Player {
         for (int i=0; i<d; i++) {
             int j = partner_ids[i];
             Point self = dancers[i];
+            Point dance_partner = dancers[j];
 
             // Update Variables
             if (enjoyment_gained[i] > 0) { // previously had a dance partner
                 idle_turns[i] = 0;
-                Point dance_partner = dancers[j];
                 
                 // update remaining available enjoyment
                 if (remainingEnjoyment[i][j] == -1 ) {
@@ -99,8 +107,16 @@ public class Player implements sqdance.sim.Player {
                 	soulmate[i] = j;
                 }
             }
+
+            if (getRelation(enjoyment_gained[i]) == 'f') {
+            	friend_pairs_seen++;
+            }
         }
         
+        total_turns++;
+
+        f_estimate = (friend_pairs_seen/total_turns) * 2 * (d-1) / d;
+
         return null;
     }
 
