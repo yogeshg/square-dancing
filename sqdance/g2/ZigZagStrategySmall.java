@@ -15,19 +15,21 @@ public class ZigZagStrategySmall implements Strategy {
 	private Point[] final_positions;
 	private HashMap<Integer, Integer> dancer_at_point;
 	
+	private int d;
+	
 	@Override
-	public Point[] generate_starting_locations() {
+	public Point[] generate_starting_locations(int d) {
+		this.d = d;
 		num_swaps = 0;
-		dancer_at_point = new HashMap<>(Player.d);
+		dancer_at_point = new HashMap<>(d);
 		
 		double y_limit = (DISTANCE_BETWEEN_DANCERS * (DANCERS_IN_A_LINE-1)) - (EPSILON * DANCERS_IN_A_LINE / 2);
-		int d = Player.d;
 		
 		Point[] positions = new Point[d];
 		double current_row = 0;
 		int dancer = 0;
-		while(dancer < Player.d) {
-			for(int i = 0; i < DANCERS_IN_A_LINE && dancer < Player.d; i += 2) {
+		while(dancer < d) {
+			for(int i = 0; i < DANCERS_IN_A_LINE && dancer < d; i += 2) {
 				double yPos = current_row * DISTANCE_BETWEEN_DANCERS;
 				double xPos1 = (current_row % 2 == 0) ?
 									(DISTANCE_BETWEEN_DANCERS * i) - (EPSILON * i / 2) :
@@ -186,11 +188,6 @@ public class ZigZagStrategySmall implements Strategy {
     	return instructions;
     }
     
-<<<<<<< HEAD
-    
-    
-=======
->>>>>>> aaee95b7de7d68b70f4e6a3ae561b0285ddb282f
     //increment current turn after everyone is done dancing with strangers/friends
     //for medium d
     //for small d just increment it every turn
