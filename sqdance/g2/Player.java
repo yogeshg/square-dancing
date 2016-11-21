@@ -78,8 +78,8 @@ public class Player implements sqdance.sim.Player {
         		soulmate);*/
         instructions = strategy.play(dancers, 
         		scores, partner_ids, enjoyment_gained,
-        		soulmate, total_turns);
-
+        		soulmate, total_turns - 1);
+        
         return instructions;
     }
 
