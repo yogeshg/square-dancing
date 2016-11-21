@@ -25,7 +25,7 @@ public class Player implements sqdance.sim.Player {
     static double room_side = -1;
     
     // Threshold values for d, TODO tune these
-    static int d1 = 4, d2 = 8;
+    static int d1 = 380, d2 = 1840;
     
     // Estimated value of f from number of dancing pairs that are friends
     int f_estimate;
