@@ -61,6 +61,9 @@ public class TilesZigZagStrategy implements Strategy {
 			
 			// TODO: Dance using the zig-zag strategy
 			Point[] instructions = new Point[d];
+			for(int i=0; i<d;++i) {
+				instructions[i] = new Point(0,0);
+			}
 			Point[] instructions_sub;
 			Point inst;
 			for(Tile t:this.tiles) {
@@ -97,10 +100,17 @@ public class TilesZigZagStrategy implements Strategy {
 	 */
 	private Point[] combineTilePositions() {
 		Point[] final_positions = new Point[d];
+		for(int i=0; i<d;++i) {
+			final_positions[i] = new Point(1,1);
+		}
+		Point p;
 		for (Tile tile : tiles) {
 			for (int pointIdx=0; pointIdx<tile.dancers;pointIdx++) {
-				final_positions[tile.getDancerAt(pointIdx)] = tile.getPoint(pointIdx);
+				p = tile.getPoint(pointIdx);
+				final_positions[tile.getDancerAt(pointIdx)] = p;
+				System.out.println(p.x+","+p.y);
 			}
+			System.out.println("-");
 		}
 		
 		return final_positions;

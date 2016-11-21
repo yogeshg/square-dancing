@@ -18,17 +18,19 @@ public class Tile {
 	public Tile(TileType type, int[] dancer_ids, Point top_left_corner, Point bottom_right_corner) {
 		this.dancer_ids = dancer_ids;
 		this.dancers = dancer_ids.length;
+		this.locations = new Point[this.dancers];
 		this.type = type;
 		if(this.type==TileType.DANCING) {
-			med = ZigZagStrategyMedium();
+			med = new ZigZagStrategyMedium();
 		} else {
-			med = DummyStrategy();
+			med = new DummyStrategy();
 		}
 		Point[] locs = med.generate_starting_locations(this.dancers);
 		Point p;
 		for(int i=0; i<this.dancers; ++i) {
 			p = locs[i].add(top_left_corner);
 			locations[i] = p;
+			// System.out.println(p);
 			// dancer_at_point.put(p,i);
 		}
 
@@ -41,7 +43,7 @@ public class Tile {
 		Point[] r = new Point[dancers.length];
 
 		for(int i=0;i<dancers.length;++i) {
-			r[i]=null;
+			r[i]=new Point(0,0);
 		}
 		if(this.type == TileType.DANCING) {
 			Point[] dancers_sub = new Point[this.dancers];
