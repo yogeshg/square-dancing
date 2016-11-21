@@ -16,7 +16,10 @@ public class Tile {
 	private Strategy med; 
 	
 	public Tile(TileType type, int[] dancer_ids, Point top_left_corner, Point bottom_right_corner) {
-		this.dancer_ids = dancer_ids;
+		this.dancer_ids = new int[dancer_ids.length];
+		for(int i=0; i<dancer_ids.length; ++i) {
+			this.dancer_ids[i] = dancer_ids[i];
+		}
 		this.dancers = dancer_ids.length;
 		this.locations = new Point[this.dancers];
 		this.type = type;

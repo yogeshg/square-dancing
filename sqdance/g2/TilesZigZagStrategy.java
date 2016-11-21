@@ -108,9 +108,12 @@ public class TilesZigZagStrategy implements Strategy {
 			for (int pointIdx=0; pointIdx<tile.dancers;pointIdx++) {
 				p = tile.getPoint(pointIdx);
 				final_positions[tile.getDancerAt(pointIdx)] = p;
-				System.out.println(p.x+","+p.y);
+				System.out.println(tile.getDancerAt(pointIdx)+","+p.x+","+p.y);
 			}
 			System.out.println("-");
+		}
+		for(int i=0; i<d;++i) {
+			System.out.println(final_positions[i].x+","+final_positions[i].y);
 		}
 		
 		return final_positions;
