@@ -59,7 +59,7 @@ public class Player implements sqdance.sim.Player {
         // TODO Change these to corresponding strategy
         if (d <= d1) strategy = new ZigZagStrategySmall();
         else if (d <= d2) strategy = new ZigZagStrategyMedium();
-        else strategy = new ZigZagStrategySmall();
+        else strategy = new TilesZigZagStrategy();
     }
 
     public Point[] generate_starting_locations() {

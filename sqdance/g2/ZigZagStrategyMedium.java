@@ -4,8 +4,11 @@ import sqdance.sim.Point;
 
 public class ZigZagStrategyMedium implements Strategy {
 	
+	private int d;
+	
 	@Override
 	public Point[] generate_starting_locations(int d) {
+		this.d = d;
 		return new ZigZagStrategySmall().generate_starting_locations(d);
 	}
 
