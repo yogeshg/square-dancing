@@ -165,7 +165,9 @@ public class ZigZagStrategyMedium implements Strategy {
 			int[] soulmate, int current_turn) {
     	System.out.println("turn, fake turn " +current_turn + " " +
 			fake_cur_turn);
-    	int d = Player.d;
+    	int d; // = Player.d;
+        assert(Player.d == dancers.length);
+        d = dancers.length;
 		Point[] instructions = playSmallD(dancers,
 	    		scores,
 	    		partner_ids,

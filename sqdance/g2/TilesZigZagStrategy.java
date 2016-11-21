@@ -11,6 +11,7 @@ import sqdance.sim.Point;
 public class TilesZigZagStrategy implements Strategy {
 	
 	private int d;
+	private float room_side;
 	
 	// tiles[0] will the main dance floor tile
 	private List<Tile> tiles;
@@ -24,27 +25,29 @@ public class TilesZigZagStrategy implements Strategy {
 	
 	public TilesZigZagStrategy() {
 		this.tiles = new LinkedList<>();
+		room_side = 20;
 	}
 
 	@Override
 	public Point[] generate_starting_locations(int d) {
 		this.d = d;
 		
-		int num_tiles = 1;
-		int dancers_per_tile = d;
+		int num_tiles = 2;
+		int dancers_per_tile = d/2;
 		
 		// Creating fist dancing tile
 		int[] dancer_ids = new int[dancers_per_tile];
 		for (int i = 0; i < dancers_per_tile; ++i) {
 			dancer_ids[i] = i;
 		}
-		Tile dancing_tile = new Tile(TileType.DANCING, dancer_ids, new Point(0,0));
+		Tile dancing_tile = new Tile(TileType.DANCING, dancer_ids, new Point(0,0), new Point(0, room_side/2));
 		tiles.add(dancing_tile);
 		
-		// Creating the rest of the tiles
-		for (int tile_num = 1; tile_num < num_tiles; ++num_tiles) {
-			
+		for (int i = 0; i < dancers_per_tile; ++i) {
+			dancer_ids[i] = i+(d/2);
 		}
+		Tile resting_tile = new Tile(TileType.RESTING, dancer_ids, new Point(0, room_side/2), new Point(0, room_side));
+		tiles.add(resting_tile);
 		
 		return combineTilePositions();
 	}
@@ -58,6 +61,17 @@ public class TilesZigZagStrategy implements Strategy {
 			
 			// TODO: Dance using the zig-zag strategy
 			Point[] instructions = new Point[d];
+			Point[] instructions_sub;
+			Point inst;
+			for(Tile t:this.tiles) {
+				instructions_sub = t.play(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn);
+				for(int i=0;i<d;++i) {
+					inst = instructions_sub[i];
+					if(inst!=null) {
+						instructions[i]=inst;
+					}
+				}
+			}
 			dancing_turns++;
 			
 			// Set move targets if dance turns are up
@@ -84,8 +98,8 @@ public class TilesZigZagStrategy implements Strategy {
 	private Point[] combineTilePositions() {
 		Point[] final_positions = new Point[d];
 		for (Tile tile : tiles) {
-			for (int point : tile.getPointKeys()) {
-				final_positions[tile.getDancerAt(point)] = tile.getPoint(point);
+			for (int pointIdx=0; pointIdx<tile.dancers;pointIdx++) {
+				final_positions[tile.getDancerAt(pointIdx)] = tile.getPoint(pointIdx);
 			}
 		}
 		
@@ -135,7 +149,7 @@ public class TilesZigZagStrategy implements Strategy {
 		for (int i = 0; i < tiles.size(); ++i) {
 			Tile tile = tiles.get(i);
 			Tile nextTile = tiles.get((i+1)%tiles.size());
-			for (int pointIdx : tile.getPointKeys()) {
+			for (int pointIdx=0; pointIdx<tile.dancers;pointIdx++) {
 				// Dancer at a point index on this tile moves to point at the same index on next tile
 				move_targets[tile.getDancerAt(pointIdx)] = nextTile.getPoint(pointIdx);
 			}
