@@ -5,71 +5,50 @@ import java.util.HashMap;
 import sqdance.sim.Point;
 
 public class ZigZagStrategySmall implements Strategy {
-	private static final double EPSILON = 0.000001;
+	private static final double EPSILON = 0.00001;
 	private static final double DISTANCE_BETWEEN_DANCERS = 0.51;
 	
 	//TODO: Set actual number (how many dancers are in each row)
-	private static final int DANCERS_IN_A_LINE = 36;
+	private static final int DANCERS_IN_A_LINE = 40;
 	private int num_swaps;
-	
+
+	private static final double offx = 0.25;
+	private static final double offy = Math.sqrt(3) * 0.25;
 	private Point[] final_positions;
-	private HashMap<Integer, Integer> dancer_at_point;
-	
-	private int d;
-	
+	private int dir = 1;
+	private int[] position;
 	@Override
 	public Point[] generate_starting_locations(int d) {
-		this.d = d;
-		num_swaps = 0;
-		dancer_at_point = new HashMap<>(d);
-		
-		double y_limit = (DISTANCE_BETWEEN_DANCERS * (DANCERS_IN_A_LINE-1)) - (EPSILON * DANCERS_IN_A_LINE / 2);
-		
-		Point[] positions = new Point[d];
-		double current_row = 0;
-		int dancer = 0;
-		while(dancer < d) {
-			for(int i = 0; i < DANCERS_IN_A_LINE && dancer < d; i += 2) {
-				double yPos = current_row * DISTANCE_BETWEEN_DANCERS;
-				double xPos1 = (current_row % 2 == 0) ?
-									(DISTANCE_BETWEEN_DANCERS * i) - (EPSILON * i / 2) :
-									y_limit - ((DISTANCE_BETWEEN_DANCERS * i) - (EPSILON * i / 2));
-				double xPos2 = (current_row % 2 == 0) ?
-									xPos1 + DISTANCE_BETWEEN_DANCERS - EPSILON :
-									xPos1 - DISTANCE_BETWEEN_DANCERS + EPSILON;
-				if (xPos2 < 0) xPos2 = 0;
-				
-				positions[dancer] = new Point(xPos1 + 0.5, yPos);
-				positions[dancer+1] = new Point(xPos2 + 0.5, yPos);
-				dancer_at_point.put(dancer, dancer);
-				dancer_at_point.put(dancer+1, dancer+1);
-				dancer += 2;
+		Point[] locations = new Point[d];
+		final_positions = new Point[d];
+		position = new int[d];
+		int dir = 1;
+		int row = 0;
+		Point current = new Point(0.01,0);
+		for(int i = 0; i < d/2; ++i) {
+			position[i] = i;
+			position[d- 1 - i] = d- 1- i;
+			locations[i] = current;
+			final_positions[i] = locations[i];
+			locations[d - i - 1] = new Point(current.x + offx + EPSILON,
+					current.y + offy);
+			double dx = locations[i].x - locations[d-i-1].x;
+			double dy = locations[i].y - locations[d-i-1].y;
+			System.out.println("dist " + Math.sqrt(dx*dx + dy*dy));
+			final_positions[d - i - 1] = locations[d - i - 1];
+			if((i+1) % DANCERS_IN_A_LINE == 0) {
+				dir = -dir;
+				current = new Point(current.x, current.y + 2*offy + 2*EPSILON);
+			} else {
+				current = new Point(current.x + dir * 2 * offx + dir*3*EPSILON, current.y);
 			}
 			
-			current_row++;
 		}
 		
-		final_positions = positions;
-		return positions;
+		num_swaps = 0;
+		return locations;
 	}
 	
-	//TODO: data structure access and update
-	private double getXfromLocation(int i) {
-		return final_positions[i].x;
-	}
-	
-	private double getYfromLocation(int i) {
-		return final_positions[i].y;
-	}
-	
-	private int getIDfromLocation(int i) {
-		return dancer_at_point.get(i);
-	}
-	
-	private void updateLocations(int i, Point new_location, int new_id) {
-		final_positions[i] = new Point( new_location.x, new_location.y);
-		dancer_at_point.put(i, new_id);
-	}
 	
     public Point[] playSmallD(Point[] dancers,
     		int[] scores,
@@ -79,6 +58,9 @@ public class ZigZagStrategySmall implements Strategy {
     		int current_turn) {
     	int d = scores.length;
     	Point[] instructions = new Point[d];
+    	
+    	
+    	
     	boolean complete = true;
     	//complete if soulmates are all found
     	for(int i = 0; i < d; ++ i) {
@@ -89,103 +71,68 @@ public class ZigZagStrategySmall implements Strategy {
     	if (complete) {
     		//move to final locations
     		int cur = 0;
+			System.out.println("done :) ");
     		for(int i = 0; i < d; ++ i) {
     			if(soulmate[i] < i) continue;
     			int j = soulmate[i];
-    			double x1 = getXfromLocation(cur);
-				double y1 = getYfromLocation(cur);
-    			double x2 = getXfromLocation(cur + 1);
-				double y2 = getYfromLocation(cur + 1);
-				cur += 2;
-				instructions[i] = new Vector(x1 - dancers[i].x,
-    					y1 - dancers[i].y)
-    					.getLengthLimitedVector(2)
+    			
+				instructions[i] = new Vector(final_positions[cur].x - dancers[i].x,
+    					final_positions[cur].y - dancers[i].y)
+    					.getLengthLimitedVector(1.9999)
     					.getPoint();
-				instructions[i] = new Vector(x2 - dancers[j].x,
-    					y2 - dancers[2].y)
-    					.getLengthLimitedVector(2)
+				instructions[j] = new Vector(final_positions[d - 1- cur].x - dancers[j].x,
+						final_positions[d -1- cur].y - dancers[j].y)
+    					.getLengthLimitedVector(1.9999)
     					.getPoint();
+				++cur;
     		}
+    		return instructions;
     	} else {
-    		for(int i = 0 ; i < d ; ++ i) {
-    			double x1 = getXfromLocation(i);
-				double y1 = getYfromLocation(i);
-				int id1 = getIDfromLocation(i);
-				//System.out.println("id x1 y1 " + id1 +" "+x1 +" " + y1 );
-				//System.out.println();
-    		}
-    		//swap and dance
     		if(current_turn % 2 == 0) {
     			//dance
+    			System.out.println("dance? ");
     			for(int i = 0; i < d; ++i) {
     				instructions[i] = new Point(0,0);
     			}
+    			return instructions;
     		} else {
-    			int[] new_id = new int[d];
-    			//swap
-				for(int i = 0; i < d; i ++) {
-					
-					double x1 = getXfromLocation(i);
-					double y1 = getYfromLocation(i);
-					int id1 = getIDfromLocation(i);
-					System.out.println(id1);
-					int next;
-					if (num_swaps % 2 == 0) 
-						next = (i % 2 == 0 ? i + 1 : i - 1);
-					else {
-						if(i == 0 || i == d-1) {
-							instructions[id1] = new Point(0, 0);
-							new_id[i] = id1;
-							//System.out.println("");
-							continue;
-						}
-						next = (i % 2 == 0 ? i - 1 : i + 1);
-					}
-					
-					double x2 = getXfromLocation(next);
-					double y2 = getYfromLocation(next);
-					int id2 = getIDfromLocation(next);
-					new_id[i] = id2;
-					System.out.println(id1 + " with " + id2);
-					Vector direction = new Vector(x2 - x1, y2 - y1);
-					int i_mod = i % (2 * DANCERS_IN_A_LINE);
-					if (num_swaps % 2 == 0) {
-	    				//swap first and second, third with fourth, ...
-						if(i_mod >= DANCERS_IN_A_LINE) {
-    						i_mod = DANCERS_IN_A_LINE - 1 - i_mod;
+    			if(current_turn % 4 == 1) {
+    				System.out.println("move weird");
+    				int pos0 = position[0];
+    				for(int i = 0; i < d - 1; ++ i) {
+    					instructions[i] = new Point(
+    							dancers[i+1].x - dancers[i].x,
+    							dancers[i+1].y - dancers[i].y);
+    					position[i] = position[i+1];
+    				}
+    				instructions[d-1] = new Point(
+							dancers[0].x - dancers[d-1].x,
+							dancers[0].y - dancers[d-1].y);
+    				position[d-1] = pos0;
+    				for(int i = 0 ; i < d; ++ i) {
+    					int row_2 = position[i] >= d/2 ? 1 :0;
+    					if(row_2 == 1) {
+    						instructions[i] = new Point(
+    								instructions[i].x + EPSILON,
+    								instructions[i].y);
     					}
-						if(i_mod % 2 == 0 && i_mod != DANCERS_IN_A_LINE - 1) {
-							direction = direction.add(2 * EPSILON, 0);
-						}
-					} else {
-	    				//swap second with third, fourth with fifth, ...
-						if(i_mod >= DANCERS_IN_A_LINE) {
-    						i_mod = DANCERS_IN_A_LINE - 1 - i_mod;
+    				}
+    				return instructions;
+    			} else {
+    				System.out.println("almost move");
+    				for(int i = 0; i < d ; ++ i) {
+    					int pos = position[i];
+    					int row_2 = (pos >= d/2)?1:0;
+    					if(row_2 == 0) 
+    						instructions[i] = new Point(0, 0);
+    					else {
+    						instructions[i] = new Point(- EPSILON,0);
     					}
-						if((i_mod % 2 == 0 && i_mod != 0) 
-								|| (i_mod == DANCERS_IN_A_LINE - 1 && DANCERS_IN_A_LINE % 2 == 0) ) {
-							direction = direction.add(-2 * EPSILON, 0);
-						} 
-					}
-					instructions[id1] = direction.getPoint();
-					
-    				
+    				}
+    				return instructions;
     			}
-    			++ num_swaps;
-
-    	    	for(int i = 0; i < d; ++i) {
-    	    		int next = new_id[i];
-    	    		System.out.println(i +" has " +new_id[i]);
-    	    		System.out.println((instructions[next]==null));
-    	    		Point new_location = 
-    	    				new Point(instructions[next].x + dancers[next].x,
-    	    						instructions[next].y + dancers[next].y);
-    	    		System.out.println("new loc " + next  + " "+new_location.x);
-    	    		updateLocations(i, new_location,new_id[i]);
-    	    	}
     		}
     	}
-    	return instructions;
     }
     
     //increment current turn after everyone is done dancing with strangers/friends
@@ -195,6 +142,12 @@ public class ZigZagStrategySmall implements Strategy {
 	public Point[] play(Point[] dancers, int[] scores,
 			int[] partner_ids, int[] enjoyment_gained,
 			int[] soulmate, int current_turn) {
-		return playSmallD(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn);
+		
+		return playSmallD(dancers,
+	    		scores,
+	    		partner_ids,
+	    		enjoyment_gained,
+	    		soulmate,
+	    		current_turn);
 	}
 }
