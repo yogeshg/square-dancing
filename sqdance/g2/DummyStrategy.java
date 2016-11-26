@@ -6,7 +6,7 @@ public class DummyStrategy implements Strategy {
     static double MIN_DIST = 0.10001;
     static double MAX_DIST = 20.0;
     static double RESOLUTION = 0.1;
-	public Point[] generate_starting_locations(int d) {
+    public Point[] generate_starting_locations(int d) {
         Point[] start = new Point[d];
         double oneDimDist;
         int num;
@@ -21,12 +21,12 @@ public class DummyStrategy implements Strategy {
         }
         return start;
     }
-	public Point[] play(Point[] dancers,
-			int[] scores,
-			int[] partner_ids,
-			int[] enjoyment_gained,
-			int[] soulmate,
-			int current_turn) {
+    public Point[] play(Point[] dancers,
+            int[] scores,
+            int[] partner_ids,
+            int[] enjoyment_gained,
+            int[] soulmate,
+            int current_turn) {
         Point[] play = new Point[dancers.length];
         return play;
     }
