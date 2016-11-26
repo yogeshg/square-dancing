@@ -78,7 +78,7 @@ public class TilesZigZagStrategy implements Strategy {
 			dancing_turns++;
 			
 			// Set move targets if dance turns are up
-			if (dancing_turns == DANCE_TURN_LIMIT) {
+			if (0 == dancing_turns%DANCE_TURN_LIMIT) {
 				setMoveTargets();
 			}
 			
@@ -87,6 +87,7 @@ public class TilesZigZagStrategy implements Strategy {
 			// If movement is complete, go to the dance part, otherwise just move
 			if (movementComplete(dancers)) {
 				move_targets = null;
+				updateMoveInTiles();
 				return play(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn);
 			} else {
 				return generateMoveInstructions(dancers);
@@ -104,7 +105,7 @@ public class TilesZigZagStrategy implements Strategy {
 		}
 		Point p;
 		for (Tile tile : tiles) {
-			for (int pointIdx=0; pointIdx<tile.dancers;pointIdx++) {
+			for (int pointIdx=0; pointIdx<tile.num_dancers;pointIdx++) {
 				p = tile.getPoint(pointIdx);
 				final_positions[tile.getDancerAt(pointIdx)] = p;
 				System.out.println(tile.getDancerAt(pointIdx)+","+p.x+","+p.y);
@@ -161,9 +162,25 @@ public class TilesZigZagStrategy implements Strategy {
 		for (int i = 0; i < tiles.size(); ++i) {
 			Tile tile = tiles.get(i);
 			Tile nextTile = tiles.get((i+1)%tiles.size());
-			for (int pointIdx=0; pointIdx<tile.dancers;pointIdx++) {
+			for (int pointIdx=0; pointIdx<tile.num_dancers;pointIdx++) {
 				// Dancer at a point index on this tile moves to point at the same index on next tile
 				move_targets[tile.getDancerAt(pointIdx)] = nextTile.getPoint(pointIdx);
+			}
+		}
+	}
+	/*
+	 * Update tiles that their dancer Ids have changed!
+	 */
+	private void updateMoveInTiles() {
+		// Note that we only have to change for n-1 tiles
+		for (int i = 0; i < tiles.size()-1; ++i) {
+			Tile tile = tiles.get(i);
+			Tile nextTile = tiles.get((i+1)%tiles.size());
+			int tempId;
+			for (int pointIdx=0; pointIdx<tile.num_dancers;pointIdx++) {
+				tempId = tile.getDancerAt(pointIdx);
+				tile.setDancerAt(pointIdx, nextTile.getDancerAt(pointIdx));
+				nextTile.setDancerAt(pointIdx, tempId);
 			}
 		}
 	}
