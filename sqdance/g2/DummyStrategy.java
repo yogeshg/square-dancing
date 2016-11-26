@@ -3,7 +3,7 @@ package sqdance.g2;
 import sqdance.sim.Point;
 
 public class DummyStrategy implements Strategy {
-    static double MIN_DIST = 0.1;
+    static double MIN_DIST = 0.10001;
     static double MAX_DIST = 20.0;
     static double RESOLUTION = 0.1;
 	public Point[] generate_starting_locations(int d) {

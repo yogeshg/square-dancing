@@ -26,6 +26,7 @@ public class Player implements sqdance.sim.Player {
     
     // Threshold values for d, TODO tune these
     static int d1 = 380, d2 = 1840;
+    // static int d1 = 4, d2 = 8;
     
     // Estimated value of f from number of dancing pairs that are friends
     int f_estimate;
@@ -70,6 +71,9 @@ public class Player implements sqdance.sim.Player {
         Point[] instructions;
         playUpdateInformation(dancers, scores, partner_ids, enjoyment_gained);
         instructions = strategy.play(dancers, scores, partner_ids, enjoyment_gained, soulmate, total_turns-1);
+        // for(Point p:instructions) {
+        //     System.out.println(p);
+        // }
         return instructions;
     }
 

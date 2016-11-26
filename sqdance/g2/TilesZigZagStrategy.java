@@ -87,12 +87,11 @@ public class TilesZigZagStrategy implements Strategy {
 			// If movement is complete, go to the dance part, otherwise just move
 			if (movementComplete(dancers)) {
 				move_targets = null;
-				play(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn);
+				return play(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn);
 			} else {
 				return generateMoveInstructions(dancers);
 			}
 		}
-		return null;
 	}
 
 	/*
