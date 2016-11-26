@@ -20,7 +20,7 @@ public class TilesZigZagStrategy implements Strategy {
 	private Point[] move_targets;
 	
 	// Number of turns for which we have been dancing
-	private static int DANCE_TURN_LIMIT = 5;
+	private static int DANCE_TURN_LIMIT = 50;
 	private int dancing_turns;
 	
 	public TilesZigZagStrategy() {
