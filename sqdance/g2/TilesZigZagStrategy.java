@@ -1,11 +1,7 @@
 package sqdance.g2;
 
-
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
-
 import sqdance.sim.Point;
 
 public class TilesZigZagStrategy implements Strategy {
@@ -100,12 +96,10 @@ public class TilesZigZagStrategy implements Strategy {
 	 */
 	private Point[] combineTilePositions() {
 		Point[] final_positions = new Point[d];
-		for(int i=0; i<d;++i) {
-			final_positions[i] = new Point(1,1);
-		}
 		Point p;
 		for (Tile tile : tiles) {
 			for (int pointIdx=0; pointIdx<tile.num_dancers;pointIdx++) {
+
 				p = tile.getPoint(pointIdx);
 				final_positions[tile.getDancerAt(pointIdx)] = p;
 				System.out.println(tile.getDancerAt(pointIdx)+","+p.x+","+p.y);
