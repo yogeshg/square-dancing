@@ -44,9 +44,9 @@ public class Tile {
             System.out.println("rs "+row_size );
             locs = ((ZigZagStrategyMedium)med).generate_starting_locations(this.num_dancers,
                     row_size,top_left_corner);
-            for(Point p:locs) {
-                System.out.println();
-            }
+            // for(Point p:locs) {
+            //     System.out.println(p);
+            // }
         } else {
             med = new DummyStrategy();
             locs = med.generate_starting_locations(this.num_dancers);
@@ -69,6 +69,8 @@ public class Tile {
 
     public Point[] play(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained, int[] soulmate,
             int current_turn) {
+        playUpdateInformation(dancers, scores, partner_ids, enjoyment_gained);
+        System.out.println(toString()+"\tplay");
             
         Point[] r = new Point[dancers.length];
 
@@ -79,19 +81,18 @@ public class Tile {
             Point[] dancers_sub = new Point[this.num_dancers];
             int[] scores_sub = new int[this.num_dancers];
             int[] partner_ids_sub = new int[this.num_dancers];
-            int[] enjoyment_gained_sub = new int[this.num_dancers];
+            // int[] enjoyment_gained_sub = new int[this.num_dancers];
             int[] soulmate_sub = new int[this.num_dancers];
 
             for (int i = 0; i < this.num_dancers; ++i) {
                 dancers_sub[i] = dancers[dancer_ids[i]];
                 scores_sub[i] = scores[dancer_ids[i]];
                 partner_ids_sub[i] = partner_ids[dancer_ids[i]];
-                enjoyment_gained_sub[i] = enjoyment_gained[dancer_ids[i]];
+                // enjoyment_gained_sub[i] = enjoyment_gained[dancer_ids[i]];
                 soulmate_sub[i] = soulmate[dancer_ids[i]];
             }
-            playUpdateInformation(dancers_sub, scores_sub, partner_ids_sub, enjoyment_gained_sub);
                 
-            Point[] r_sub = med.play(dancers_sub, scores_sub, partner_ids_sub, enjoyment_gained_sub, soulmate_sub,
+            Point[] r_sub = med.play(dancers_sub, scores_sub, partner_ids_sub, enjoyment_gained, soulmate_sub,
                     current_turn, remainingEnjoyment);
             System.out.println((r_sub == null));
             Point p;
@@ -131,11 +132,21 @@ public class Tile {
         
         return 0;
     }
+    // Gets information about all the players here
     public Point[] playUpdateInformation(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained) {
+        System.out.println(toString()+"\tplayUpdateInformation");
         for (int i=0; i<num_dancers; i++) {
-            int j = partner_ids[i];
+            int partner_id = partner_ids[dancer_ids[i]];
+            int j = -1;
+            for(int j2=0; j2<num_dancers;++j2) {
+                if(dancer_ids[j2]==partner_id) {
+                    j=j2;
+                    break;
+                }
+            }
+
             Point self = dancers[i];
-            Point dance_partner = dancers[j];
+            // Point dance_partner = dancers[j];
 
             // Update Variables
             if (enjoyment_gained[i] > 0) { // previously had a dance partner
