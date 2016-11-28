@@ -3,11 +3,13 @@ package sqdance.g2;
 import sqdance.sim.Point;
 
 public class ZigZagStrategyMedium implements Strategy {
+    public static double MIN_DIST = 0.5;
+    public static double MAX_DIST = 20.0;
 	
 	private static final double EPSILON = 0.00000001;
 	
 	//TODO: Set actual number (how many dancers are in each row)
-	private int DANCERS_IN_A_LINE = 40;
+	private int DANCERS_IN_A_LINE = (int) (MAX_DIST/MIN_DIST);
 	private int fake_cur_turn;
 	private int d;
 	int f_est;
@@ -19,15 +21,53 @@ public class ZigZagStrategyMedium implements Strategy {
 	//what % of friends to keep dancing even if strangers are exhausted
 	//TODO: tune
 	private  double FRIEND_FREQUENCY = 0.75;
-	private static final double offx = 0.25;
-	private static final double offy = Math.sqrt(3) * 0.25;
+	private static final double offx = MIN_DIST/2;
+	private static final double offy = Math.sqrt(3) * MIN_DIST/2;
 	private Point[] final_positions;
 	private int dir = 1;
 	private int[] position;
 	private Point current;
 	boolean just_started;
+
+/*
+
+@Kailash, Can we change the signature of the functions to following:
+
+    @Override
+    public Point[] generate_starting_locations(int d) {
+        // DANCERS_IN_A_LINE = dl;
+        // TURNS_TO_ESTIMATE = -1;
+        // f_est = 0;
+        // FRIEND_FREQUENCY = 100;
+        return generate_starting_locations(d, DANCERS_IN_A_LINE, new Point(EPSILON, 0));
+    }
+    public Point[] generate_starting_locations(int d, int dl, Point start) {
+        assert(DANCERS_IN_A_LINE >= dl) : dl;
+        current = start;
+        // f_est=0;
+
+        this.d = d;
+        just_started = true;
+        f_est_turns = 0;
+        f_est_pairs = 0;
+        Point[] locations = new Point[d];
+        final_positions = new Point[d];
+        position = new int[d];
+        int dir = 1;
+        int row = 0;
+        // current = new Point(0.01,0);
+    ...
+    ...
+    }
+
+
+*/
+
+// @Kailash, From here
+// /*
 	
 	public Point[] generate_starting_locations(int d, int dl, Point start) {
+        assert(DANCERS_IN_A_LINE >= dl) : dl;
 		current = start;
 		DANCERS_IN_A_LINE = dl;
 		TURNS_TO_ESTIMATE = -1;
@@ -47,6 +87,10 @@ public class ZigZagStrategyMedium implements Strategy {
 		int dir = 1;
 		int row = 0;
 		current = new Point(0.01,0);
+
+// */
+// @Kailash, to here
+
 		for(int i = 0; i < d/2; ++i) {
 			position[i] = i;
 			position[d- 1 - i] = d- 1- i;
@@ -76,6 +120,9 @@ public class ZigZagStrategyMedium implements Strategy {
 		}
 		
 		fake_cur_turn = 0;
+        // for(Point p:locations) {
+        //     System.out.println(p);
+        // }
 		return locations;
 	}
 	

@@ -37,14 +37,19 @@ public class TilesZigZagStrategy implements Strategy {
         for (int i = 0; i < dancers_per_tile; ++i) {
             dancer_ids[i] = i;
         }
-        Tile dancing_tile = new Tile(TileType.DANCING, dancer_ids, new Point(0, 0), new Point(room_side, room_side / 2));
+        Point top = new Point(0,0);
+        Point bottom = Tile.find_bottom_right_corner(TileType.DANCING, dancers_per_tile, top);
+        System.out.println(top + "->" + bottom);
+        Tile dancing_tile = new Tile(TileType.DANCING, dancer_ids, top, bottom);
         tiles.add(dancing_tile);
 
         for (int i = 0; i < dancers_per_tile; ++i) {
             dancer_ids[i] = i + (d / 2);
         }
-        Tile resting_tile = new Tile(TileType.RESTING, dancer_ids, new Point(0, room_side / 2),
-                new Point(room_side, room_side));
+        top = new Point(top.x, bottom.y+1);
+        bottom = Tile.find_bottom_right_corner(TileType.RESTING, dancers_per_tile, top);
+        System.out.println(top + "->" + bottom);
+        Tile resting_tile = new Tile(TileType.RESTING, dancer_ids, top, bottom);
         tiles.add(resting_tile);
 
         return combineTilePositions();
@@ -119,11 +124,11 @@ public class TilesZigZagStrategy implements Strategy {
                 p = tile.getPoint(pointIdx);
                 final_positions[tile.getDancerAt(pointIdx)] = p;
             }
-            System.out.println("-");
+            // System.out.println("-");
         }
-        for (int i = 0; i < d; ++i) {
-            System.out.println(final_positions[i].x + "," + final_positions[i].y);
-        }
+        // for (int i = 0; i < d; ++i) {
+        //     System.out.println(final_positions[i]);
+        // }
 
         return final_positions;
     }
@@ -176,10 +181,10 @@ public class TilesZigZagStrategy implements Strategy {
             }
         }
 
-        System.out.println("Move targets");
-        for (Point point : move_targets) {
-            System.out.println(point);
-        }
+        // System.out.println("Move targets");
+        // for (Point point : move_targets) {
+        //     System.out.println(point);
+        // }
     }
 
     /*

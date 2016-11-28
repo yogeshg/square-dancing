@@ -19,6 +19,26 @@ public class Tile {
         return "Tile: " + type.name() + " num_dancers:" + num_dancers;
     }
 
+    public static Point find_bottom_right_corner(TileType type, int num_dancers, Point top_left_corner) {
+        Point bottom_right_corner;
+        bottom_right_corner=null;
+        int num_rows;
+        double xDist = 0;
+        double yDist = 0;
+        if(type==TileType.DANCING) {
+            xDist = ZigZagStrategyMedium.MAX_DIST;
+            num_rows = (int)(num_dancers / ((float)(ZigZagStrategyMedium.MAX_DIST/ZigZagStrategyMedium.MIN_DIST)));
+            // System.out.println(num_rows+","+ZigZagStrategyMedium.MIN_DIST);
+            yDist = (num_rows+1) * Math.sqrt(3) * ZigZagStrategyMedium.MIN_DIST/2 ;
+        } else if(type==TileType.RESTING) {
+            xDist = DummyStrategy.MAX_DIST;
+            num_rows = (int)(num_dancers / ((float)(DummyStrategy.MAX_DIST/DummyStrategy.MIN_DIST)));
+            yDist = num_rows * DummyStrategy.MIN_DIST;
+        }
+        bottom_right_corner = top_left_corner.add(new Point(xDist, yDist));
+        return bottom_right_corner;
+    }
+
     public Tile(TileType type, int[] dancer_ids, Point top_left_corner, Point bottom_right_corner) {
         assert(0 == (dancer_ids.length%2));
         this.dancer_ids = new int[dancer_ids.length];
@@ -28,7 +48,7 @@ public class Tile {
         this.num_dancers = dancer_ids.length;
         this.locations = new Point[this.num_dancers];
         this.type = type;
-        System.out.println(toString());
+        // System.out.println(toString());
         remainingEnjoyment = new int[num_dancers][num_dancers];
         for (int i=0 ; i<num_dancers ; i++) {
             for (int j=0; j<num_dancers; j++) {
@@ -38,9 +58,9 @@ public class Tile {
         Point[] locs;
         if (this.type == TileType.DANCING) {
             med = new ZigZagStrategyMedium();
-            System.out.println(bottom_right_corner.x + " " +top_left_corner.x);
-            System.out.println(bottom_right_corner.y + " " +top_left_corner.y);
-            int row_size = (int)((bottom_right_corner.x - top_left_corner.x)/0.5);
+            System.out.println(bottom_right_corner);
+            System.out.println(top_left_corner);
+            int row_size = (int)((bottom_right_corner.x - top_left_corner.x)/ZigZagStrategyMedium.MIN_DIST);
             System.out.println("rs "+row_size );
             locs = ((ZigZagStrategyMedium)med).generate_starting_locations(this.num_dancers,
                     row_size,top_left_corner);
@@ -55,6 +75,8 @@ public class Tile {
         Point p;
         for (int i = 0; i < this.num_dancers; ++i) {
             p = locs[i].add(top_left_corner);
+            assert(p.x < bottom_right_corner.x) : p.x+" < "+bottom_right_corner.x;
+            assert(p.y < bottom_right_corner.y) : p.y+" < "+bottom_right_corner.y;
             Point new_p = new Point(p.x, p.y);
             locations[i] = new_p;
             // System.out.println(p);
@@ -70,7 +92,7 @@ public class Tile {
     public Point[] play(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained, int[] soulmate,
             int current_turn) {
         playUpdateInformation(dancers, scores, partner_ids, enjoyment_gained);
-        System.out.println(toString()+"\tplay");
+        // System.out.println(toString()+"\tplay");
             
         Point[] r = new Point[dancers.length];
 
@@ -94,7 +116,7 @@ public class Tile {
                 
             Point[] r_sub = med.play(dancers_sub, scores_sub, partner_ids_sub, enjoyment_gained, soulmate_sub,
                     current_turn, remainingEnjoyment);
-            System.out.println((r_sub == null));
+            // System.out.println((r_sub == null));
             Point p;
             Point q;
             for (int i = 0; i < this.num_dancers; ++i) {
@@ -134,7 +156,7 @@ public class Tile {
     }
     // Gets information about all the players here
     public Point[] playUpdateInformation(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained) {
-        System.out.println(toString()+"\tplayUpdateInformation");
+        // System.out.println(toString()+"\tplayUpdateInformation");
         for (int i=0; i<num_dancers; i++) {
             int partner_id = partner_ids[dancer_ids[i]];
             int j = -1;
