@@ -171,6 +171,12 @@ public class TilesZigZagStrategy implements Strategy {
      */
     private void setMoveTargets() {
         move_targets = new Point[d];
+        
+        int temp_dancers_at[] = new int[tiles.get(tiles.size()-1).num_dancers];
+        for (int i = 0; i < tiles.get(tiles.size()-1).num_dancers; ++i) {
+        	temp_dancers_at[i] = tiles.get(tiles.size()-1).getDancerAt(i);
+        }
+        
         for (int i = 0; i < tiles.size(); ++i) {
             Tile tile = tiles.get(i);
             Tile nextTile = tiles.get((i + 1) % tiles.size());
@@ -179,6 +185,22 @@ public class TilesZigZagStrategy implements Strategy {
                 // same index on next tile
                 move_targets[tile.getDancerAt(pointIdx)] = nextTile.getPoint(pointIdx);
             }
+        }
+        
+        // Update positions of dancers
+        for (int i = tiles.size() - 1; i > 0; --i) {
+        	Tile tile = tiles.get(i);
+        	Tile prevTile = tiles.get((i - 1) % tiles.size());
+        	for (int pointIdx = 0; pointIdx < tile.num_dancers; pointIdx++) {
+        		// Dancer at this index will be the dancer at the same index
+                // on the previous tile
+        		tile.setDancerAt(pointIdx, prevTile.getDancerAt(pointIdx));
+        	}
+        }
+        // Because of circular position update
+        for (int i = 0; i < tiles.get(tiles.size()-1).num_dancers; ++i) {
+        	Tile tile = tiles.get(0);
+        	tile.setDancerAt(i, temp_dancers_at[i]);
         }
 
         // System.out.println("Move targets");

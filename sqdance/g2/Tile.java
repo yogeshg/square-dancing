@@ -121,8 +121,6 @@ public class Tile {
             Point q;
             for (int i = 0; i < this.num_dancers; ++i) {
                 p = r_sub[i];
-                // dancer_at_point.put(locations[i],i);
-                // dancer_at_point.remove(q);
                 r[i] = p;
             }
         }
@@ -133,10 +131,6 @@ public class Tile {
     public Point getPoint(int idx) {
         return locations[idx];
     }
-
-    // public Set<Integer> getPointKeys() {
-    // return dancer_at_point.keySet();
-    // }
 
     public int getDancerAt(int idx) {
         return this.dancer_ids[idx];
