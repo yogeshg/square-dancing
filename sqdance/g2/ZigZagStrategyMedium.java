@@ -4,12 +4,12 @@ import sqdance.sim.Point;
 
 public class ZigZagStrategyMedium implements Strategy {
 	
-	private static final double EPSILON = 0.00001;
+	private static final double EPSILON = 0.00000001;
 	
 	//TODO: Set actual number (how many dancers are in each row)
-	private static final int DANCERS_IN_A_LINE = 40;
+	private static int DANCERS_IN_A_LINE = 40;
 	private int fake_cur_turn;
-
+	private int d;
 	int f_est;
 	int f_est_turns;
 	int f_est_pairs;
@@ -18,7 +18,7 @@ public class ZigZagStrategyMedium implements Strategy {
 	
 	//what % of friends to keep dancing even if strangers are exhausted
 	//TODO: tune
-	private static final double FRIEND_FREQUENCY = 0.6;
+	private static final double FRIEND_FREQUENCY = 0.75;
 	private static final double offx = 0.25;
 	private static final double offy = Math.sqrt(3) * 0.25;
 	private Point[] final_positions;
@@ -28,6 +28,7 @@ public class ZigZagStrategyMedium implements Strategy {
 	boolean just_started;
 	@Override
 	public Point[] generate_starting_locations(int d) {
+		this.d = d;
 		just_started = true;
 		f_est_turns = 0;
 		f_est_pairs = 0;
@@ -48,6 +49,14 @@ public class ZigZagStrategyMedium implements Strategy {
 			double dy = locations[i].y - locations[d-i-1].y;
 			//System.out.println("dist " + Math.sqrt(dx*dx + dy*dy));
 			final_positions[d - i - 1] = locations[d - i - 1];
+			/*if(dir < 0) {
+				Point pos = locations[i];
+				locations[i] = new Point(locations[i].x, locations[d-1-i].y);
+				locations[d-1-i] = new Point(locations[d-1-i].x, pos.y);
+				final_positions[i] = locations[i];
+				final_positions[d-1-i] = locations[d-1-i];
+				
+			}*/
 			if((i+1) % DANCERS_IN_A_LINE == 0) {
 				dir = -dir;
 				current = new Point(current.x, current.y + 2*offy + 2*EPSILON);
@@ -150,19 +159,28 @@ public class ZigZagStrategyMedium implements Strategy {
     
     void estimate_f(int d, int[] enjoyment_gained) {
     	for(int i = 0 ; i <d ; ++ i) {
-    		if(enjoyment_gained[i] == 4) ++ f_est_pairs;
+    		if(enjoyment_gained[i] >= 4) ++ f_est_pairs;
     	}
     	++f_est_turns;
     	f_est = (int)((f_est_pairs/(double)f_est_turns) * (d-1) / (double)d + 0.5);
     	// System.out.println("f est" + f_est);
     }
+    
+    
+    @Override
+	public Point[] play(Point[] dancers, int[] scores,
+			int[] partner_ids, int[] enjoyment_gained,
+			int[] soulmate, int current_turn) {
+    	return null;
+    }
+    
     //increment current turn after everyone is done dancing with strangers/friends
     //for medium d
     //for small d just increment it every turn
     @Override
 	public Point[] play(Point[] dancers, int[] scores,
 			int[] partner_ids, int[] enjoyment_gained,
-			int[] soulmate, int current_turn) {
+			int[] soulmate, int current_turn, int[][] remainingEnjoyment) {
         // System.out.println("turn, fake turn " +current_turn + " " +
         //     fake_cur_turn);
     	int d; // = Player.d;
@@ -182,18 +200,26 @@ public class ZigZagStrategyMedium implements Strategy {
 		} else if(fake_cur_turn %2 == 1) {
 			++fake_cur_turn;
 		} else {
-			int num_str = 0, num_fr = 0;
+			/*int num_str = 0, num_fr = 0;
 			for(int i = 0 ; i < d ; ++ i) {
 				if(enjoyment_gained[i] == 3) ++ num_str;
 				else if(enjoyment_gained[i] == 4) ++ num_fr;
+			}*/
+			int fin_str = 0, fin_fr = 0;
+			for(int i = 0 ; i < d; ++i) {
+				int j = partner_ids[i];
+				if(enjoyment_gained[i] == 3 && remainingEnjoyment[i][j] == 0) {
+					++ fin_str;
+				} else if(enjoyment_gained[i] > 3 
+						&& remainingEnjoyment[i][j] == 0) {
+					++ fin_fr;
+				}
 			}
-			if(num_str == 0 && (f_est < d * FRIEND_FREQUENCY || num_fr == 0)
-					&& !just_started) {
+			if((fin_str > 0 && f_est < d * FRIEND_FREQUENCY)
+					|| (f_est >= d * FRIEND_FREQUENCY && fin_fr > 0)) {
 				System.out.println("done dancing, time to swap!");
 				++ fake_cur_turn;
-				just_started = true;
-			} else if(just_started) {
-				just_started = false;
+			//	just_started = true;
 			}
 		}
 		return instructions;

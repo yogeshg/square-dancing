@@ -30,4 +30,14 @@ public class DummyStrategy implements Strategy {
         Point[] play = new Point[dancers.length];
         return play;
     }
+    public Point[] play(Point[] dancers,
+            int[] scores,
+            int[] partner_ids,
+            int[] enjoyment_gained,
+            int[] soulmate,
+            int current_turn,
+            int[][] remainingEnjoyment) {
+        Point[] play = new Point[dancers.length];
+        return play;
+    }
 }

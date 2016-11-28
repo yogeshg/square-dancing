@@ -55,6 +55,12 @@ public class TilesZigZagStrategy implements Strategy {
 	@Override
 	public Point[] play(Point[] dancers, int[] scores,
 			int[] partner_ids, int[] enjoyment_gained,
+			int[] soulmate, int current_turn, int[][] remainingEnjoyment) {
+		return null;
+	}
+	@Override
+	public Point[] play(Point[] dancers, int[] scores,
+			int[] partner_ids, int[] enjoyment_gained,
 			int[] soulmate, int current_turn) {
 		if (move_targets == null) {
 			// Not moving, dancing
