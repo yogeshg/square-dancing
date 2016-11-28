@@ -7,25 +7,32 @@ public class ZigZagStrategyMedium implements Strategy {
 	private static final double EPSILON = 0.00000001;
 	
 	//TODO: Set actual number (how many dancers are in each row)
-	private static int DANCERS_IN_A_LINE = 40;
+	private int DANCERS_IN_A_LINE = 40;
 	private int fake_cur_turn;
 	private int d;
 	int f_est;
 	int f_est_turns;
 	int f_est_pairs;
 	//how many turns to run small strategy to estimate friends
-	private static final int TURNS_TO_ESTIMATE = 10;
+	private int TURNS_TO_ESTIMATE= 10;
 	
 	//what % of friends to keep dancing even if strangers are exhausted
 	//TODO: tune
-	private static final double FRIEND_FREQUENCY = 0.75;
+	private  double FRIEND_FREQUENCY = 0.75;
 	private static final double offx = 0.25;
 	private static final double offy = Math.sqrt(3) * 0.25;
 	private Point[] final_positions;
 	private int dir = 1;
 	private int[] position;
-
+	private Point current;
 	boolean just_started;
+	
+	public Point[] generate_starting_locations(int d, int dl, Point start) {
+		current = start;
+		DANCERS_IN_A_LINE = dl;
+		TURNS_TO_ESTIMATE = 0;
+		return generate_starting_locations(d);
+	}
 	@Override
 	public Point[] generate_starting_locations(int d) {
 		this.d = d;
@@ -37,7 +44,7 @@ public class ZigZagStrategyMedium implements Strategy {
 		position = new int[d];
 		int dir = 1;
 		int row = 0;
-		Point current = new Point(0.01,0);
+		current = new Point(0.01,0);
 		for(int i = 0; i < d/2; ++i) {
 			position[i] = i;
 			position[d- 1 - i] = d- 1- i;
