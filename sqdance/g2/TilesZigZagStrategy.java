@@ -1,5 +1,6 @@
 package sqdance.g2;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import sqdance.sim.Point;
@@ -18,7 +19,7 @@ public class TilesZigZagStrategy implements Strategy {
 	// Number of turns for which we have been dancing
 	private static int DANCE_TURN_LIMIT = 50;
 	private int dancing_turns;
-
+	int dancers_per_tile;
 	public TilesZigZagStrategy() {
 		this.tiles = new LinkedList<>();
 		room_side = 20;
@@ -29,21 +30,21 @@ public class TilesZigZagStrategy implements Strategy {
 		this.d = d;
 
 		int num_tiles = 2;
-		int dancers_per_tile = d / 2;
+		dancers_per_tile = d / 2;
 
 		// Creating fist dancing tile
 		int[] dancer_ids = new int[dancers_per_tile];
 		for (int i = 0; i < dancers_per_tile; ++i) {
 			dancer_ids[i] = i;
 		}
-		Tile dancing_tile = new Tile(TileType.DANCING, dancer_ids, new Point(0, 0), new Point(0, room_side / 2));
+		Tile dancing_tile = new Tile(TileType.DANCING, dancer_ids, new Point(0, 0), new Point(room_side, room_side / 2));
 		tiles.add(dancing_tile);
 
 		for (int i = 0; i < dancers_per_tile; ++i) {
 			dancer_ids[i] = i + (d / 2);
 		}
 		Tile resting_tile = new Tile(TileType.RESTING, dancer_ids, new Point(0, room_side / 2),
-				new Point(0, room_side));
+				new Point(room_side, room_side));
 		tiles.add(resting_tile);
 
 		return combineTilePositions();
@@ -69,14 +70,24 @@ public class TilesZigZagStrategy implements Strategy {
 			}
 			Point[] instructions_sub;
 			Point inst;
+			int ii = 0;
 			for (Tile t : this.tiles) {
-				instructions_sub = t.play(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn);
-				for (int i = 0; i < d; ++i) {
+				int from = ii * dancers_per_tile;
+				int to = ii * dancers_per_tile + dancers_per_tile;
+				instructions_sub = t.play(Arrays.copyOfRange(dancers, from, to),
+						Arrays.copyOfRange(scores, from, to),
+						Arrays.copyOfRange(partner_ids, from, to),
+						Arrays.copyOfRange(enjoyment_gained, from, to),
+						Arrays.copyOfRange(soulmate, from, to),
+						current_turn);
+				
+				for (int i = 0; i < dancers_per_tile; ++i) {
 					inst = instructions_sub[i];
 					if (inst != null) {
-						instructions[i] = inst;
+						instructions[i + ii * dancers_per_tile] = inst;
 					}
 				}
+				++ii;
 			}
 			dancing_turns++;
 

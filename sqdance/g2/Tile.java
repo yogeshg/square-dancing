@@ -27,12 +27,20 @@ public class Tile {
 		this.num_dancers = dancer_ids.length;
 		this.locations = new Point[this.num_dancers];
 		this.type = type;
+		Point[] locs;
 		if (this.type == TileType.DANCING) {
 			med = new ZigZagStrategyMedium();
+			System.out.println(bottom_right_corner.x + " " +top_left_corner.x);
+			System.out.println(bottom_right_corner.y + " " +top_left_corner.y);
+			int row_size = (int)((bottom_right_corner.x - top_left_corner.x)/0.5);
+			System.out.println("rs "+row_size );
+			locs = ((ZigZagStrategyMedium)med).generate_starting_locations(this.num_dancers,
+					row_size,top_left_corner);
 		} else {
 			med = new DummyStrategy();
+			locs = med.generate_starting_locations(this.num_dancers);
 		}
-		Point[] locs = med.generate_starting_locations(this.num_dancers);
+		
 		Point p;
 		for (int i = 0; i < this.num_dancers; ++i) {
 			p = locs[i].add(top_left_corner);
