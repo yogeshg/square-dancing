@@ -217,7 +217,6 @@ public class ZigZagStrategyMedium implements Strategy {
 			}
 			if((fin_str > 0 && f_est < d * FRIEND_FREQUENCY)
 					|| (f_est >= d * FRIEND_FREQUENCY && fin_fr > 0)) {
-				System.out.println("done dancing, time to swap!");
 				++ fake_cur_turn;
 			//	just_started = true;
 			}

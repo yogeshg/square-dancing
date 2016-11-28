@@ -27,106 +27,107 @@ class Simulator {
 
     public static void main(String[] args)
     {
-    int friends = 10;
-    int participants = 88;
-    boolean verbose = false;
-    int room_side = 20;
-    int turns = 1800;
-    boolean gui = false;
-    long gui_refresh = 100;
-    String[] groups = null;
-    PrintStream out = null;
-    Class <Player> player_class = null;
-    String group = "g2";
-    try {
-        for (int a = 0 ; a != args.length ; ++a)
-        if (args[a].equals("-f") || args[a].equals("--friends")) {
-            if (++a == args.length)
-            throw new IllegalArgumentException("Missing number of friends");
-            friends = Integer.parseInt(args[a]);
-            if (friends < 0)
-            throw new IllegalArgumentException("Invalid number of friends");
-        } else if (args[a].equals("-d") || args[a].equals("--participants")) {
-            if (++a == args.length)
-            throw new IllegalArgumentException("Missing number of total participants");
-            participants = Integer.parseInt(args[a]);
-        } else if (args[a].equals("-g") || args[a].equals("--group")) {
-            if (++a == args.length) 
-            throw new IllegalArgumentException("Missing group number");
-            group = args[a];
-        } else if (args[a].equals("-t") || args[a].equals("--turns")) {
-            if (++a == args.length)
-            throw new IllegalArgumentException("Missing number of turns");
-            turns = Integer.parseInt(args[a]);
-            if (turns <= 0)
-            throw new IllegalArgumentException("Invalid number of turns");
-        } else if (args[a].equals("--fps")) {
-            if (++a == args.length)
-            throw new IllegalArgumentException("Missing FPS");
-            double gui_fps = Double.parseDouble(args[a]);
-            gui_refresh = gui_fps > 0.0 ? Math.round(1000.0 / gui_fps) : -1;
-            gui = true;
-        } else if (args[a].equals("--file")) {
-            if (++a == args.length)
-            throw new IllegalArgumentException("Invalid file path");
-            out = new PrintStream(new FileOutputStream(args[a], false));
-        } else if (args[a].equals("--gui")) gui = true;
-        else if (args[a].equals("--verbose")) verbose = true;
-        else throw new IllegalArgumentException("Unknown argument: " + args[a]);
-        if (participants <= friends + 1)
-        throw new IllegalArgumentException("Invalid number of total participants");     
-        player_class = load(group);
-    } catch (Exception e) {
-        System.err.println("Error during setup: " + e.getMessage());
-        e.printStackTrace();
-        System.exit(1);
-    }
-    
-    int strangers = participants - friends - 2;
-    // print info
-    System.out.println("Total participants: " + participants);
-    System.out.println("Friends: " + friends);
-    System.out.println("Strangers: " + strangers);
-    if (!gui)
-        System.out.println("GUI: disabled");
-    else if (gui_refresh < 0)
-        System.out.println("GUI: enabled  (0 FPS)  [reload manually]");
-    else if (gui_refresh == 0)
-        System.out.println("GUI: enabled  (max FPS)");
-    else {
-        double fps = 1000.0 / gui_refresh;
-        System.out.println("GUI: enabled  (up to " + fps + " FPS)");
-    }
-    if (out == null) out = System.err;
-    else {
-        System.out.close();
-        System.err.close();
-    }
-    // start game
-    int[] score = new int [participants];
-    boolean[] met_soulmate = new boolean [participants];
-    int max_score = -1;
-    try {
-        max_score = game(group, player_class, friends, strangers,
-                 room_side, turns, score, met_soulmate,
-                 gui, gui_refresh, verbose);
-    } catch (Exception e) {
-        System.err.println("Error during the game: " + e.getMessage());
-        e.printStackTrace();
-        System.exit(1);
-    }
-    int min_score = Integer.MAX_VALUE;
-    for (int i = 0 ; i != score.length ; ++i) {
-        out.println("Player " + i + " (" + group +
-            ") scored: " + score[i] +
-            (score[i] == max_score ? " (maximum score) " : " ") +
-            (met_soulmate[i] ? "[soulmate dance]" : ""));
-        if (score[i] < min_score)
-        min_score = score[i];
-    }
-    out.println("Minimum score: " + min_score);
-    if (out != System.err) out.close(); 
-    System.exit(0);
+
+	int friends = 10;
+	int participants = 20;
+	boolean verbose = false;
+	int room_side = 20;
+	int turns = 1800;
+	boolean gui = false;
+	long gui_refresh = 100;
+	String[] groups = null;
+	PrintStream out = null;
+	Class <Player> player_class = null;
+	String group = "g2";
+	try {
+	    for (int a = 0 ; a != args.length ; ++a)
+		if (args[a].equals("-f") || args[a].equals("--friends")) {
+		    if (++a == args.length)
+			throw new IllegalArgumentException("Missing number of friends");
+		    friends = Integer.parseInt(args[a]);
+		    if (friends < 0)
+			throw new IllegalArgumentException("Invalid number of friends");
+		} else if (args[a].equals("-d") || args[a].equals("--participants")) {
+		    if (++a == args.length)
+			throw new IllegalArgumentException("Missing number of total participants");
+		    participants = Integer.parseInt(args[a]);
+		} else if (args[a].equals("-g") || args[a].equals("--group")) {
+		    if (++a == args.length) 
+			throw new IllegalArgumentException("Missing group number");
+		    group = args[a];
+		} else if (args[a].equals("-t") || args[a].equals("--turns")) {
+		    if (++a == args.length)
+			throw new IllegalArgumentException("Missing number of turns");
+		    turns = Integer.parseInt(args[a]);
+		    if (turns <= 0)
+			throw new IllegalArgumentException("Invalid number of turns");
+		} else if (args[a].equals("--fps")) {
+		    if (++a == args.length)
+			throw new IllegalArgumentException("Missing FPS");
+		    double gui_fps = Double.parseDouble(args[a]);
+		    gui_refresh = gui_fps > 0.0 ? Math.round(1000.0 / gui_fps) : -1;
+		    gui = true;
+		} else if (args[a].equals("--file")) {
+		    if (++a == args.length)
+			throw new IllegalArgumentException("Invalid file path");
+		    out = new PrintStream(new FileOutputStream(args[a], false));
+		} else if (args[a].equals("--gui")) gui = true;
+		else if (args[a].equals("--verbose")) verbose = true;
+		else throw new IllegalArgumentException("Unknown argument: " + args[a]);
+	    if (participants <= friends + 1)
+		throw new IllegalArgumentException("Invalid number of total participants");	    
+	    player_class = load(group);
+	} catch (Exception e) {
+	    System.err.println("Error during setup: " + e.getMessage());
+	    e.printStackTrace();
+	    System.exit(1);
+	}
+	
+	int strangers = participants - friends - 2;
+	// print info
+	System.out.println("Total participants: " + participants);
+	System.out.println("Friends: " + friends);
+	System.out.println("Strangers: " + strangers);
+	if (!gui)
+	    System.out.println("GUI: disabled");
+	else if (gui_refresh < 0)
+	    System.out.println("GUI: enabled  (0 FPS)  [reload manually]");
+	else if (gui_refresh == 0)
+	    System.out.println("GUI: enabled  (max FPS)");
+	else {
+	    double fps = 1000.0 / gui_refresh;
+	    System.out.println("GUI: enabled  (up to " + fps + " FPS)");
+	}
+	if (out == null) out = System.err;
+	else {
+	    System.out.close();
+	    System.err.close();
+	}
+	// start game
+	int[] score = new int [participants];
+	boolean[] met_soulmate = new boolean [participants];
+	int max_score = -1;
+	try {
+	    max_score = game(group, player_class, friends, strangers,
+			     room_side, turns, score, met_soulmate,
+			     gui, gui_refresh, verbose);
+	} catch (Exception e) {
+	    System.err.println("Error during the game: " + e.getMessage());
+	    e.printStackTrace();
+	    System.exit(1);
+	}
+	int min_score = Integer.MAX_VALUE;
+	for (int i = 0 ; i != score.length ; ++i) {
+	    out.println("Player " + i + " (" + group +
+			") scored: " + score[i] +
+			(score[i] == max_score ? " (maximum score) " : " ") +
+			(met_soulmate[i] ? "[soulmate dance]" : ""));
+	    if (score[i] < min_score)
+		min_score = score[i];
+	}
+	out.println("Minimum score: " + min_score);
+	if (out != System.err) out.close();	
+	System.exit(0);
     }
 
     private static final Random random = new Random();
