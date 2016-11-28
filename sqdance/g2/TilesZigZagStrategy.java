@@ -72,19 +72,17 @@ public class TilesZigZagStrategy implements Strategy {
 			Point inst;
 			int ii = 0;
 			for (Tile t : this.tiles) {
-				int from = ii * dancers_per_tile;
-				int to = ii * dancers_per_tile + dancers_per_tile;
-				instructions_sub = t.play(Arrays.copyOfRange(dancers, from, to),
-						Arrays.copyOfRange(scores, from, to),
-						Arrays.copyOfRange(partner_ids, from, to),
-						Arrays.copyOfRange(enjoyment_gained, from, to),
-						Arrays.copyOfRange(soulmate, from, to),
+				instructions_sub = t.play(dancers,
+						scores,
+						partner_ids,
+						enjoyment_gained,
+						soulmate,
 						current_turn);
 				
-				for (int i = 0; i < dancers_per_tile; ++i) {
+				for (int i = 0; i < d; ++i) {
 					inst = instructions_sub[i];
 					if (inst != null) {
-						instructions[i + ii * dancers_per_tile] = inst;
+						instructions[i] = inst;
 					}
 				}
 				++ii;

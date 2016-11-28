@@ -30,7 +30,9 @@ public class ZigZagStrategyMedium implements Strategy {
 	public Point[] generate_starting_locations(int d, int dl, Point start) {
 		current = start;
 		DANCERS_IN_A_LINE = dl;
-		TURNS_TO_ESTIMATE = 0;
+		TURNS_TO_ESTIMATE = -1;
+		f_est = 0;
+		FRIEND_FREQUENCY = 100;
 		return generate_starting_locations(d);
 	}
 	@Override
