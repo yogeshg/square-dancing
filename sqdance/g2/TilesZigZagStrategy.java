@@ -59,12 +59,6 @@ public class TilesZigZagStrategy implements Strategy {
     public Point[] play(Point[] dancers, int[] scores,
             int[] partner_ids, int[] enjoyment_gained,
             int[] soulmate, int current_turn, int[][] remainingEnjoyment) {
-        return null;
-    }
-    @Override
-    public Point[] play(Point[] dancers, int[] scores,
-            int[] partner_ids, int[] enjoyment_gained,
-            int[] soulmate, int current_turn) {
         if (move_targets == null) {
             // Not moving, dancing
 
@@ -106,7 +100,7 @@ public class TilesZigZagStrategy implements Strategy {
             if (movementComplete(dancers)) {
                 move_targets = null;
                 updateMoveInTiles();
-                return play(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn);
+                return play(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn, remainingEnjoyment);
             } else {
                 return generateMoveInstructions(dancers);
             }

@@ -222,14 +222,6 @@ public class ZigZagStrategyMedium implements Strategy {
     	// System.out.println("f est" + f_est);
     }
     
-    
-    @Override
-	public Point[] play(Point[] dancers, int[] scores,
-			int[] partner_ids, int[] enjoyment_gained,
-			int[] soulmate, int current_turn) {
-    	return null;
-    }
-    
     //increment current turn after everyone is done dancing with strangers/friends
     //for medium d
     //for small d just increment it every turn
