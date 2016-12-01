@@ -2,25 +2,27 @@ package sqdance.g2;
 
 import sqdance.sim.Point;
 
-public class Vector extends Point {
+public class Vector {
 
-    // double x;
-    // double y;
-    public
-    int state;
+    double x;
+    double y;
+    public int state;
 
     final double EPSILON = 1e-7;
 
     public Vector( double x, double y){
-        super(x, y);
+        this.x = x;
+        this.y = y;
     }
 
     public Vector(Point p){
-        super(p.x, p.y);
+        this.x = p.x;
+        this.y = p.y;
     }
 
     public Vector(Vector p){
-        super(p.x, p.y);
+    	this.x = p.x;
+        this.y = p.y;
     }
 
     public Point getPoint() {
