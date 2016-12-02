@@ -16,55 +16,18 @@ public class ZigZagStrategy1600 implements Strategy {
 	int f_est_turns;
 	int f_est_pairs;
 	//how many turns to run small strategy to estimate friends
-	private int TURNS_TO_ESTIMATE= 10;
+	private int TURNS_TO_ESTIMATE = 10;
 	
 	//what % of friends to keep dancing even if strangers are exhausted
 	//TODO: tune
 	private  double FRIEND_FREQUENCY = 0.75;
 	private static final double offx = MIN_DIST/2;
-	private static final double offy = Math.sqrt(3) * MIN_DIST/2;
+	private static final double offy = MIN_DIST;
 	private Point[] final_positions;
 	private int dir = 1;
 	private int[] position;
 	private Point current;
 	boolean just_started;
-
-/*
-
-@Kailash, Can we change the signature of the functions to following:
-
-    @Override
-    public Point[] generate_starting_locations(int d) {
-        // DANCERS_IN_A_LINE = dl;
-        // TURNS_TO_ESTIMATE = -1;
-        // f_est = 0;
-        // FRIEND_FREQUENCY = 100;
-        return generate_starting_locations(d, DANCERS_IN_A_LINE, new Point(EPSILON, 0));
-    }
-    public Point[] generate_starting_locations(int d, int dl, Point start) {
-        assert(DANCERS_IN_A_LINE >= dl) : dl;
-        current = start;
-        // f_est=0;
-
-        this.d = d;
-        just_started = true;
-        f_est_turns = 0;
-        f_est_pairs = 0;
-        Point[] locations = new Point[d];
-        final_positions = new Point[d];
-        position = new int[d];
-        int dir = 1;
-        int row = 0;
-        // current = new Point(0.01,0);
-    ...
-    ...
-    }
-
-
-*/
-
-// @Kailash, From here
-// /*
 	
 	public Point[] generate_starting_locations(int d, int dl, Point start) {
         assert(DANCERS_IN_A_LINE >= dl) : dl;
@@ -75,6 +38,7 @@ public class ZigZagStrategy1600 implements Strategy {
 		FRIEND_FREQUENCY = 100;
 		return generate_starting_locations(d);
 	}
+	
 	@Override
 	public Point[] generate_starting_locations(int d) {
 		this.d = d;
@@ -96,20 +60,11 @@ public class ZigZagStrategy1600 implements Strategy {
 			position[d- 1 - i] = d- 1- i;
 			locations[i] = current;
 			final_positions[i] = locations[i];
-			locations[d - i - 1] = new Point(current.x + offx + EPSILON,
+			locations[d - i - 1] = new Point(current.x + EPSILON,
 					current.y + offy);
-			double dx = locations[i].x - locations[d-i-1].x;
-			double dy = locations[i].y - locations[d-i-1].y;
-			//System.out.println("dist " + Math.sqrt(dx*dx + dy*dy));
+
 			final_positions[d - i - 1] = locations[d - i - 1];
-			/*if(dir < 0) {
-				Point pos = locations[i];
-				locations[i] = new Point(locations[i].x, locations[d-1-i].y);
-				locations[d-1-i] = new Point(locations[d-1-i].x, pos.y);
-				final_positions[i] = locations[i];
-				final_positions[d-1-i] = locations[d-1-i];
-				
-			}*/
+		
 			if((i+1) % DANCERS_IN_A_LINE == 0) {
 				dir = -dir;
 				current = new Point(current.x, current.y + 2*offy + 2*EPSILON);
@@ -120,14 +75,11 @@ public class ZigZagStrategy1600 implements Strategy {
 		}
 		
 		fake_cur_turn = 0;
-        // for(Point p:locations) {
-        //     System.out.println(p);
-        // }
 		return locations;
 	}
 	
 	
-    public Point[] playSmallD(Point[] dancers,
+	public Point[] playSmallD(Point[] dancers,
     		int[] scores,
     		int[] partner_ids,
     		int[] enjoyment_gained,
@@ -135,8 +87,6 @@ public class ZigZagStrategy1600 implements Strategy {
     		int current_turn) {
     	int d = scores.length;
     	Point[] instructions = new Point[d];
-    	
-    	
     	
     	boolean complete = true;
     	//complete if soulmates are all found
@@ -148,7 +98,7 @@ public class ZigZagStrategy1600 implements Strategy {
     	if (complete) {
     		//move to final locations
     		int cur = 0;
-			//System.out.println("done :) ");
+			System.out.println("done :) ");
     		for(int i = 0; i < d; ++ i) {
     			if(soulmate[i] < i) continue;
     			int j = soulmate[i];
@@ -167,14 +117,14 @@ public class ZigZagStrategy1600 implements Strategy {
     	} else {
     		if(current_turn % 2 == 0) {
     			//dance
-    			//System.out.println("dance? ");
+    			System.out.println("dance");
     			for(int i = 0; i < d; ++i) {
     				instructions[i] = new Point(0,0);
     			}
     			return instructions;
     		} else {
     			if(current_turn % 4 == 1) {
-    				//System.out.println("move weird");
+    				System.out.println("move weird");
     				int pos0 = position[0];
     				for(int i = 0; i < d - 1; ++ i) {
     					instructions[i] = new Point(
@@ -196,7 +146,7 @@ public class ZigZagStrategy1600 implements Strategy {
     				}
     				return instructions;
     			} else {
-    				//System.out.println("almost move");
+    				System.out.println("almost move");
     				for(int i = 0; i < d ; ++ i) {
     					int pos = position[i];
     					int row_2 = (pos >= d/2)?1:0;
@@ -244,19 +194,14 @@ public class ZigZagStrategy1600 implements Strategy {
 		if(current_turn <= TURNS_TO_ESTIMATE) {
 			if(fake_cur_turn % 2 == 1)
 				estimate_f(d, enjoyment_gained);
-			++ fake_cur_turn;
-		} else if(fake_cur_turn %2 == 1) {
+			++fake_cur_turn;
+		} else if(fake_cur_turn % 2 == 1) {
 			++fake_cur_turn;
 		} else {
-			/*int num_str = 0, num_fr = 0;
-			for(int i = 0 ; i < d ; ++ i) {
-				if(enjoyment_gained[i] == 3) ++ num_str;
-				else if(enjoyment_gained[i] == 4) ++ num_fr;
-			}*/
 			int fin_str = 0, fin_fr = 0;
 			for(int i = 0 ; i < d; ++i) {
 				int j = partner_ids[i];
-				if(enjoyment_gained[i] == 3 && remainingEnjoyment[i][j] == 0) {
+				if(enjoyment_gained[i] <= 3 && remainingEnjoyment[i][j] == 0) {
 					++ fin_str;
 				} else if(enjoyment_gained[i] > 3 
 						&& remainingEnjoyment[i][j] == 0) {

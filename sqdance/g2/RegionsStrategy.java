@@ -303,6 +303,8 @@ public class RegionsStrategy implements Strategy {
 			}
 		}
 		
+		if (num_dancing_cols % 2 == 1) num_dancing_cols++;
+		
 		return Vector.getPoints(locations);
 	}
 

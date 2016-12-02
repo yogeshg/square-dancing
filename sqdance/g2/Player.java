@@ -25,7 +25,7 @@ public class Player implements sqdance.sim.Player {
 	static double room_side = -1;
 
 	// Threshold values for d, TODO tune these
-	static int d1 = 620, d2 = 1840;
+	static int d1 = 908, d2 = 1600, d3 = 1840;
 	// static int d1 = 2, d2 = 8;
 
 	// Estimated value of f from number of dancing pairs that are friends
@@ -62,6 +62,8 @@ public class Player implements sqdance.sim.Player {
 		if (d <= d1)
 			strategy = new ZigZagStrategySmall();
 		else if (d <= d2)
+			strategy = new ZigZagStrategy1600();
+		else if (d <= d3)
 			strategy = new ZigZagStrategyMedium();
 		else
 			strategy = new RegionsStrategy();
