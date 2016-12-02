@@ -201,7 +201,7 @@ public class ZigZagStrategy1600 implements Strategy {
 			int fin_str = 0, fin_fr = 0;
 			for(int i = 0 ; i < d; ++i) {
 				int j = partner_ids[i];
-				if(enjoyment_gained[i] == 3 && remainingEnjoyment[i][j] == 0) {
+				if(enjoyment_gained[i] <= 3 && remainingEnjoyment[i][j] == 0) {
 					++ fin_str;
 				} else if(enjoyment_gained[i] > 3 
 						&& remainingEnjoyment[i][j] == 0) {
