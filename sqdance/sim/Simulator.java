@@ -29,7 +29,7 @@ class Simulator {
     {
 
 	int friends = 10;
-	int participants = 1900;
+	int participants = 4000;
 	boolean verbose = false;
 	int room_side = 20;
 	int turns = 1800;

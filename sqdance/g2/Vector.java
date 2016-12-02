@@ -110,6 +110,6 @@ public class Vector {
     // public getSideOfLine(Vector line, )
 
     public String toString() {
-        return "("+String.format("%.2f", x)+","+String.format("%.2f", y)+")";
+        return "("+String.format("%.6f", x)+","+String.format("%.6f", y)+")";
     }
 }

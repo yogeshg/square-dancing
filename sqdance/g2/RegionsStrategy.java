@@ -38,6 +38,9 @@ public class RegionsStrategy implements Strategy {
 		
 		Vector[] locations = new Vector[d];
 		dancer_locations = new HashMap<>();
+		region1Dancers = new HashMap<>();
+		region2Dancers = new HashMap<>();
+		region3Dancers = new HashMap<>();
 		
 		/*
 		 *  Calculate batch size and the target score
@@ -133,7 +136,7 @@ public class RegionsStrategy implements Strategy {
 			this.target_score = (1800/num_batches - 9) * (20*(3+Player.f_estimate)/21);
 		}
 		
-		if (isMovementComplete()) {
+		/*if (isMovementComplete()) {
 			if (target_score_reached(scores)) {
 				setMoveTargets();
 				play(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn, remainingEnjoyment);
@@ -143,7 +146,7 @@ public class RegionsStrategy implements Strategy {
 		} else {
 			return Vector.getPoints(generateMoveInstructions());
 		}
-		
+		*/
 		return null;
 	}
 
