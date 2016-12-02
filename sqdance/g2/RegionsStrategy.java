@@ -36,7 +36,7 @@ public class RegionsStrategy implements Strategy {
 	int batch_size;
 	int num_batches;
 	int target_score;
-	
+	int num_dancing_cols;
 	@Override
 	public Point[] generate_starting_locations(int d) {
 		
@@ -50,7 +50,7 @@ public class RegionsStrategy implements Strategy {
 		 *  Calculate batch size and the target score
 		 */
 		
-		int num_dancing_cols = (int) Math.ceil((18.8 - root3*DISTANCE_BETWEEN_IDLERS*d/400)
+		num_dancing_cols = (int) Math.ceil((18.8 - root3*DISTANCE_BETWEEN_IDLERS*d/400)
 											   / (root3*DISTANCE_BETWEEN_DANCERS/2 - root3*DISTANCE_BETWEEN_IDLERS/10))
 								 - 1;
 		batch_size = 40 * num_dancing_cols;
@@ -174,6 +174,9 @@ public class RegionsStrategy implements Strategy {
 		}
 		return true;
 	}
+	
+	//assumptions : even dancers per column
+	// at least 2 columns
 	void dance(Point[] instructions) {
 		int d = region2Dancers.size();
 		int[] newregion2dancers = new int[d];
@@ -182,30 +185,24 @@ public class RegionsStrategy implements Strategy {
 			int id = region2Dancers.get(i);
 			ids[i] = id;
 			Point location = dancer_locations.get(id).getVector().getPoint();
-			if(i == 0 ||
-				(i % (DANCERS_IN_A_LINE*2) < DANCERS_IN_A_LINE
-				&& i % (DANCERS_IN_A_LINE*2) > 0) ) {
-				int id2 = region2Dancers.get(i+1);
-				Point location2 = dancer_locations.get(id2).getVector().getPoint();
-				instructions[id] = getDirection(location, location2);
-				newregion2dancers[i+1] = id;
-			} else if(i == DANCERS_IN_A_LINE* 2 - 1 || (i % (DANCERS_IN_A_LINE*2) >= DANCERS_IN_A_LINE
-					&& i % (DANCERS_IN_A_LINE*2) < 2*DANCERS_IN_A_LINE - 1) ) {
-				int id2 = region2Dancers.get(i-1);
-				Point location2 = dancer_locations.get(id2).getVector().getPoint();
-				instructions[id] = getDirection(location, location2);
-				newregion2dancers[i-1] = id;
-			} else if(i!=0 && i % (DANCERS_IN_A_LINE) == 0) {
-				int id2 = region2Dancers.get(i-DANCERS_IN_A_LINE);
-				Point location2 = dancer_locations.get(id2).getVector().getPoint();
-				instructions[id] = getDirection(location, location2);
-				newregion2dancers[i-DANCERS_IN_A_LINE] = id;
+			int next = -1;
+			if(i + 1 < DANCERS_IN_A_LINE) {
+				next = i + 1;
+			} else if(i == DANCERS_IN_A_LINE ) {
+				next = i - DANCERS_IN_A_LINE;
+			} else if(i == DANCERS_IN_A_LINE - 1) {
+				next = i + DANCERS_IN_A_LINE;
+			} else if((i% DANCERS_IN_A_LINE) % 2 == 0 && i/DANCERS_IN_A_LINE != 1) {
+				next = i - DANCERS_IN_A_LINE;
+			} else if((i % DANCERS_IN_A_LINE) % 2 == 1 && i/DANCERS_IN_A_LINE != num_dancing_cols - 1){
+				next = i + DANCERS_IN_A_LINE;
 			} else {
-				int id2 = region2Dancers.get(i+DANCERS_IN_A_LINE);
-				Point location2 = dancer_locations.get(id2).getVector().getPoint();
-				instructions[id] = getDirection(location, location2);
-				newregion2dancers[i+DANCERS_IN_A_LINE] = id;
+				next = i - 1;
 			}
+			int id2 = region2Dancers.get(next);
+			Point location2 = dancer_locations.get(id2).getVector().getPoint();
+			instructions[id] = getDirection(location, location2);
+			newregion2dancers[next] = id;
 		}
 		
 		//r2d
