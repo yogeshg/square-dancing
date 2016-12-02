@@ -148,10 +148,11 @@ public class RegionsStrategy implements Strategy {
         double x_min = 20.0;
         HashSet<Integer> move_target_ids_shifted = new HashSet<Integer>();
         int migration_size = batch_size;
-        if( region1Size < 2*batch_size ) {
+        /*if( region1Size < 2*batch_size ) {
         	System.out.println("Migrating half region");
         	migration_size = (batch_size + d%batch_size)/2;
-        }
+        }*/
+        migration_size = Math.min(batch_size, region1Size);
         if (region1Size==0) {
         	System.out.println("No need to migrate");
         	migration_size = 0;
@@ -232,10 +233,10 @@ public class RegionsStrategy implements Strategy {
 		target_score = 500;
 		
 		int dancers_in_round_1 = batch_size;
-		if (num_batches == 2) {
-			dancers_in_round_1 = d % 4 == 0 ? d/2 : d/2 + 1;
-			dancers_in_round_1 = ((int)Math.ceil(dancers_in_round_1/80))*80;
-		}
+//		if (num_batches == 2) {
+//			dancers_in_round_1 = d % 4 == 0 ? d/2 : d/2 + 1;
+//			dancers_in_round_1 = ((int)Math.ceil(dancers_in_round_1/80))*80;
+//		}
 		
 		/*
 		 * Make regions
