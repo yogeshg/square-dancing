@@ -71,17 +71,17 @@ public class RegionsStrategy implements Strategy {
             instructions[i] = difference;
         }
 
-        for (int i = 0; i < d; i+=100) {
-        	System.out.print(move_targets[i]);
-        	System.out.print("\t");
-        }
-        System.out.println();
-        for (int i = 0; i < d; i+=100) {
-        	System.out.print(dancer_locations.get(i).getVector());
-        	System.out.print("\t");
-        }
-        System.out.println();
-        System.out.println();
+        // for (int i = 0; i < d; i+=100) {
+        // 	System.out.print(move_targets[i]);
+        // 	System.out.print("\t");
+        // }
+        // System.out.println();
+        // for (int i = 0; i < d; i+=100) {
+        // 	System.out.print(dancer_locations.get(i).getVector());
+        // 	System.out.print("\t");
+        // }
+        // System.out.println();
+        // System.out.println();
         for(int i=0; i<d; ++i) {
         	dancer_locations.get(i).getVector().x += instructions[i].x;
         	dancer_locations.get(i).getVector().y += instructions[i].y;
@@ -119,7 +119,16 @@ public class RegionsStrategy implements Strategy {
         double x_max = 0.0;
         double x_min = 20.0;
         HashSet<Integer> move_target_ids_shifted = new HashSet<Integer>();
-        for(int i=0; i<batch_size; ++i) {
+        int migration_size = batch_size;
+        if( region1Size < 2*batch_size ) {
+        	System.out.println("Migrating half region");
+        	migration_size = (batch_size + d%batch_size)/2;
+        }
+        // if (region1Size==0) {
+        // 	System.out.println("No need to migrate");
+        // 	migration_size = 0;
+        // }
+        for(int i=0; i<migration_size; ++i) {
         	try {
 	        	d1_id = region1Dancers.get(region1Size-1);
 	        	d2_id = region2Dancers.get(i);
@@ -137,6 +146,8 @@ public class RegionsStrategy implements Strategy {
 	        	--region1Size;
 	        	++region3size;
         	} catch (Exception e) {
+        		System.out.println("Exception in migration");
+        		break;
         	}
         }
     	double x_shift = x_min - x_max;
