@@ -14,7 +14,7 @@ public class RegionsStrategy implements Strategy {
 	boolean not_est = true;
 	private static final int DANCERS_IN_A_LINE = 40;
 	private static final int IDLERS_IN_A_LINE = 200;
-	
+	private  double SCORE_RATIO = 0.95;
 	private static final double root3 = Math.sqrt(3);
 	
 	//turns to dance with stranger, dont change.
@@ -207,6 +207,9 @@ public class RegionsStrategy implements Strategy {
 	public Point[] generate_starting_locations(int d) {
 
 		this.d = d;
+		SCORE_RATIO = 1;
+		if ( d >= 7000) SCORE_RATIO = 0.95;
+		if ( d >= 10001) SCORE_RATIO = 0.9;
 		
 		Vector[] locations = new Vector[d];
 		dancer_locations = new HashMap<>();
@@ -318,13 +321,14 @@ public class RegionsStrategy implements Strategy {
 	int turnnum = 0;
 	
 	void est_f_and_upd_sc(int[] enjg) {
+		if(true) return;
 		int f = 0;
 		for(int i = 0 ; i < region2Dancers.size(); ++i) {
 			int id = region2Dancers.get(i);
 			if(enjg[id] > 3) ++f;
 		}
 		double f_f = f * 1.0 / region2Dancers.size();
-		this.target_score = (int)((1800.0/num_batches - 9) * (20*(3.0 + f_f)/21));
+		this.target_score = (int)((1800.0/num_batches - 9) * (20*(3.0 + f_f/2)/21));
 		System.out.println("new score " + this.target_score);
 	}
 	@Override
@@ -335,7 +339,7 @@ public class RegionsStrategy implements Strategy {
 		for(int i = 0 ; i < d ;++i) 
 			instructions[i] = new Point(0,0);
 		if (current_turn == 2) {
-			this.target_score = (int)((1800.0/num_batches - 9) * (20*(3.0)/21));
+			this.target_score = (int)((1800.0/num_batches - 9) * (20*(3.0)/21)*SCORE_RATIO);
 			System.out.println(num_batches + " ** " +this.target_score);
 //			this.target_score = 20;
 		}
