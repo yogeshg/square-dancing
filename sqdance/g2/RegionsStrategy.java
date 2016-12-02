@@ -14,6 +14,8 @@ public class RegionsStrategy implements Strategy {
 	
 	private static final double root3 = Math.sqrt(3);
 	
+	//turns to dance with stranger, dont change.
+	private static final int STRANGER_DANCE_TURNS = 20;
 	private static final double DISTANCE_BETWEEN_DANCERS = 0.500001;
 	private static final double DANCER_LINE_GAP = root3 / 2 * DISTANCE_BETWEEN_DANCERS;
 	private static final double DISTANCE_BETWEEN_IDLERS = 0.1;
@@ -22,6 +24,8 @@ public class RegionsStrategy implements Strategy {
 	Vector[] region1;
 	Vector[] region2;
 	Vector[] region3;
+	
+	DancingTime dankDancers;
 	
 	HashMap<Integer, Integer> local_ids, actual_ids;
 	HashMap<Integer, Integer> region1Dancers, region2Dancers, region3Dancers;
@@ -128,28 +132,40 @@ public class RegionsStrategy implements Strategy {
 		return Vector.getPoints(locations);
 	}
 
+	int turnnum = 0;
 	@Override
 	public Point[] play(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained, int[] soulmate,
 			int current_turn, int[][] remainingEnjoyment) {
-		
+		int d = dancers.length;
+		Point[] instructions = new Point[d];
+		for(int i = 0 ; i < d ;++i) 
+			instructions[i] = new Point(0,0);
 		if (current_turn == 8) {
 			this.target_score = (1800/num_batches - 9) * (20*(3+Player.f_estimate)/21);
 		}
 		
-		/*if (isMovementComplete()) {
+		if (isMovementComplete()) {
 			if (target_score_reached(scores)) {
 				setMoveTargets();
 				play(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn, remainingEnjoyment);
 			} else {
-				// TODO dance
+				if(turnnum < STRANGER_DANCE_TURNS) {
+					
+					++ turnnum;
+				} else {
+					turnnum = 0;
+					dance(instructions);
+				}
+				
 			}
 		} else {
 			return Vector.getPoints(generateMoveInstructions());
 		}
-		*/
-		return null;
+		return instructions;
 	}
-
+	Point getDirection(Point a, Point b) {
+		return new Point(b.x - a.x, b.y - a.y);
+	}
 	private boolean target_score_reached(int[] scores) {
 		for (int i = 0; i < scores.length; ++i) {
 			if (dancer_locations.get(i).region.equals(region2) && scores[i] < target_score) {
@@ -158,7 +174,51 @@ public class RegionsStrategy implements Strategy {
 		}
 		return true;
 	}
-
+	void dance(Point[] instructions) {
+		int d = region2Dancers.size();
+		int[] newregion2dancers = new int[d];
+		int[] ids = new int[d];
+		for(int i = 0 ; i < region2Dancers.size(); ++i) {
+			int id = region2Dancers.get(i);
+			ids[i] = id;
+			Point location = dancer_locations.get(id).getVector().getPoint();
+			if(i == 0 ||
+				(i % (DANCERS_IN_A_LINE*2) < DANCERS_IN_A_LINE
+				&& i % (DANCERS_IN_A_LINE*2) > 0) ) {
+				int id2 = region2Dancers.get(i+1);
+				Point location2 = dancer_locations.get(id2).getVector().getPoint();
+				instructions[id] = getDirection(location, location2);
+				newregion2dancers[i+1] = id;
+			} else if(i == DANCERS_IN_A_LINE* 2 - 1 || (i % (DANCERS_IN_A_LINE*2) >= DANCERS_IN_A_LINE
+					&& i % (DANCERS_IN_A_LINE*2) < 2*DANCERS_IN_A_LINE - 1) ) {
+				int id2 = region2Dancers.get(i-1);
+				Point location2 = dancer_locations.get(id2).getVector().getPoint();
+				instructions[id] = getDirection(location, location2);
+				newregion2dancers[i-1] = id;
+			} else if(i!=0 && i % (DANCERS_IN_A_LINE) == 0) {
+				int id2 = region2Dancers.get(i-DANCERS_IN_A_LINE);
+				Point location2 = dancer_locations.get(id2).getVector().getPoint();
+				instructions[id] = getDirection(location, location2);
+				newregion2dancers[i-DANCERS_IN_A_LINE] = id;
+			} else {
+				int id2 = region2Dancers.get(i+DANCERS_IN_A_LINE);
+				Point location2 = dancer_locations.get(id2).getVector().getPoint();
+				instructions[id] = getDirection(location, location2);
+				newregion2dancers[i+DANCERS_IN_A_LINE] = id;
+			}
+		}
+		
+		//r2d
+		for(int i = 0 ; i < region2Dancers.size(); ++i) {
+			region2Dancers.put(i, newregion2dancers[i]);
+		}
+		//dlocs
+		for(int i = 0 ; i < region2Dancers.size(); ++i) {
+			int id = ids[i];
+			dancer_locations.get(id).getVector().x += instructions[id].x;
+			dancer_locations.get(id).getVector().y += instructions[id].y;
+		}
+	}
 }
 
 // Has an array reference and the index of a point into it
