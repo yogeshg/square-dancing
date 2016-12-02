@@ -11,7 +11,7 @@ import sqdance.sim.Point;
 public class RegionsStrategy implements Strategy {
 	
 	private static final double EPSILON = 0.0000001;
-	
+	boolean not_est = true;
 	private static final int DANCERS_IN_A_LINE = 40;
 	private static final int IDLERS_IN_A_LINE = 200;
 	
@@ -316,6 +316,17 @@ public class RegionsStrategy implements Strategy {
 	}
 
 	int turnnum = 0;
+	
+	void est_f_and_upd_sc(int[] enjg) {
+		int f = 0;
+		for(int i = 0 ; i < region2Dancers.size(); ++i) {
+			int id = region2Dancers.get(i);
+			if(enjg[id] > 3) ++f;
+		}
+		double f_f = f * 1.0 / region2Dancers.size();
+		this.target_score = (int)((1800.0/num_batches - 9) * (20*(3.0 + f_f)/21));
+		System.out.println("new score " + this.target_score);
+	}
 	@Override
 	public Point[] play(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained, int[] soulmate,
 			int current_turn, int[][] remainingEnjoyment) {
@@ -323,10 +334,10 @@ public class RegionsStrategy implements Strategy {
 		Point[] instructions = new Point[d];
 		for(int i = 0 ; i < d ;++i) 
 			instructions[i] = new Point(0,0);
-		if (current_turn == 8) {
-			this.target_score = (1800/num_batches - 9) * (20*(3)/21);
+		if (current_turn == 2) {
+			this.target_score = (int)((1800.0/num_batches - 9) * (20*(3.0)/21));
 			System.out.println(num_batches + " ** " +this.target_score);
-			this.target_score = 20;
+//			this.target_score = 20;
 		}
 		
 		if (isMovementComplete()) {
@@ -337,6 +348,10 @@ public class RegionsStrategy implements Strategy {
 				if(turnnum < STRANGER_DANCE_TURNS) {
 					
 					++ turnnum;
+					if(turnnum == 3 && not_est) {
+						est_f_and_upd_sc(enjoyment_gained);
+						not_est = false;
+					}
 				} else {
 					turnnum = 0;
 					dance(instructions);
