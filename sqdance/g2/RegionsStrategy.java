@@ -149,9 +149,6 @@ public class RegionsStrategy implements Strategy {
 	// YOGESH ZONE ENDS
 
 
-
-
-	
 	@Override
 	public Point[] generate_starting_locations(int d) {
 
@@ -226,6 +223,12 @@ public class RegionsStrategy implements Strategy {
 				current.y = next % (2*DANCERS_IN_A_LINE) == 0 ? EPSILON : DISTANCE_BETWEEN_DANCERS / 2;
 			} else {
 				current.y += DISTANCE_BETWEEN_DANCERS + EPSILON;
+			}
+			
+			// Splitting last column if there are odd number of columns
+			if (num_dancing_cols % 2 == 1 && next == batch_size - DANCERS_IN_A_LINE/2) {
+				current.x += DANCER_LINE_GAP;
+				current.y = DISTANCE_BETWEEN_DANCERS / 2;
 			}
 		}
 		
