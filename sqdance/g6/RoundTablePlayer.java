@@ -7,7 +7,7 @@ import java.util.*;
 
 // "Round" table approach
 
-public class ZigZagStrategySmall implements Strategy {
+public class RoundTablePlayer implements sqdance.sim.Player {
 
 
     // random generator
@@ -75,7 +75,6 @@ public class ZigZagStrategySmall implements Strategy {
     public Point[] generate_starting_locations(int d) {
     	init(d, 20);
 		Point[] L  = new Point [d];
-		Point[] LL = new Point[d];
 		for (int i = 0 ; i < d ; ++i) {
 			L[i] = round_table[i][1 - (i % 2)];
 			target[i] = L[i];
@@ -83,10 +82,7 @@ public class ZigZagStrategySmall implements Strategy {
 			round_table_list.add(i);
 			in_round_table[i] = true;
 		}
-		for(int i = 0; i < d; ++ i) {
-			LL[i] = L[i + ];
-		}
-		return LL;
+		return L;
     }
 
     // play function
@@ -226,7 +222,7 @@ public class ZigZagStrategySmall implements Strategy {
 
 		return dst;
 	}
-	public static class Utils {
+	public class Utils {
 	public static Point add(Point a, Point b) {
 		return new Point(a.x + b.x, a.y + b.y);
 	}
