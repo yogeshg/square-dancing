@@ -5,21 +5,22 @@ import sqdance.sim.Point;
 import java.io.*;
 import java.util.*;
 
-// credit to g6
+// ``Round" table approach
+
 public class ZigZagStrategySmall implements Strategy {
 
 	private final double cell_range = 0.002;
 	private final double grid_length = 0.5 + 3 * cell_range;
 	private Point[][] grid;
 	private int grid_size = 19;
-	// Indicate whether a cell is occupier
-	private int[] occupier;
+	// Indicate whether a cell is occupied
+	private boolean[] occupied;
 
 	private Point[][] round_table;
 
     // E[i][j]: the remaining enjoyment player j can give player i
     // -1 if the value is unknown (everything unknown upon initialization)
-    //private int[][] E = null;
+    private int[][] E = null;
 
     // random generator
     private Random random = null;
@@ -51,17 +52,13 @@ public class ZigZagStrategySmall implements Strategy {
 		generate_round_table();
 
 		random = new Random();
-		occupier = new int[round_table.length];
-		for (int i = 0; i < round_table.length; ++ i)
-			occupier[i] = -1;
-
-		/*
 		E = new int [d][d];
+		occupied = new boolean[round_table.length];
 		for (int i = 0; i < d; ++ i) {
 			for (int j = 0; j < d; ++ j) {
 				E[i][j] = i == j ? 0 : -1;
 			}
-		}*/
+		}
 
 		in_round_table = new boolean[d];
 		target = new Point[d];
@@ -82,11 +79,6 @@ public class ZigZagStrategySmall implements Strategy {
 			round_table_list.add(i);
 			in_round_table[i] = true;
 		}
-		Point[] LL = new Point[d];
-		for(int i = 0 ; i < d/2 ; ++ i) {
-			LL[2*i] = L[2*i+1];
-			LL[2*i+1] = L[2*i];
-		}
 		return L;
     }
 
@@ -95,7 +87,8 @@ public class ZigZagStrategySmall implements Strategy {
     // scores: cumulative score of the dancers
     // partner_ids: index of the current dance partner. -1 if no dance partner
     // enjoyment_gained: integer amount (-5,0,3,4, or 6) of enjoyment gained in the most recent 6-second interval
-    public Point[] play(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained, int[] soulmate, int turn, int[][] remenj) {
+    public Point[] play(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained,
+    	int[] soulmate, int turn, int[][] remenj) {
 
 		Point[] instructions = new Point[d];
 
@@ -115,26 +108,17 @@ public class ZigZagStrategySmall implements Strategy {
 			}
 			if (finished) mode = 1;
 		} else {
-			// Detect soulmate
+			// Detection
 			List<Integer> found = new ArrayList<Integer>();
 			for (int i = permutation; i + 1 < round_table_list.size(); i += 2) {
 				int l = round_table_list.get(i);
 				int r = round_table_list.get(i + 1);
 
-				if (partner_ids[l] != r) {
+				/*if (partner_ids[l] != r) {
 					// Assessment
-					//System.err.println("Fatal #" + i + ": " + l + "(position " + position[l] + ") isn't dancing with " + r + "(position " + position[r] + ")");
-					//System.err.println("l: (" + dancers[l].x + "," + dancers[l].y + ") r: (" + dancers[r].x + "," + dancers[r].y + ")");
-
-					/*
-					for (int k = 0; k < round_table_list.size(); ++ k) {
-						int p = round_table_list.get(k);
-						System.err.println( k + " (" + dancers[p].x + "," + dancers[p].y + ")");
-					}
-					*/
-					//while (true);
-					//return instructions;
-				}
+					System.err.println("Fatal: " + l + " isn't dancing with " + r);
+					return null;
+				}*/
 
 				if (enjoyment_gained[l] == 6) {
 					// Soul mate found!
@@ -151,21 +135,16 @@ public class ZigZagStrategySmall implements Strategy {
 					// For each pair of soul mates, find a suitable place for them
 					int l = found.get(i), r = found.get(i + 1);
 					in_round_table[l] = in_round_table[r] = false;
-
-					int dst = settleSoulMate(newd, position[l]);
-					if (dst == -1) {
-						for (int p = newd; p < round_table.length; p += 2) {
-							if (occupier[p] != -1 || occupier[p + 1] != -1) continue;
-							double dd = distance(dancers[l], round_table[p][1]);
-							if (dst == -1 || dd < distance(dancers[l], round_table[dst][1]))
-								dst = p;
-						}
+					int dst = -1;
+					for (int p = newd; p < round_table.length; p += 2) {
+						if (occupied[p] || occupied[p + 1]) continue;
+						double dd = distance(dancers[l], round_table[p][1]);
+						if (dst == -1 || dd < distance(dancers[l], round_table[dst][1]))
+							dst = p;
 					}
-					//System.err.println(i + " " + dst + " " + distance(dancers[l], round_table[dst][1]));
-
 					target[l] = round_table[dst][1];
 					target[r] = round_table[dst + 1][0];
-					occupier[dst] = l; occupier[dst + 1] = r;
+					occupied[dst] = occupied[dst + 1] = true;
 				}
 
 				round_table_list.removeAll(found);
@@ -176,8 +155,7 @@ public class ZigZagStrategySmall implements Strategy {
 				int l = round_table_list.get(i);
 				int r = round_table_list.get(i + 1);
 
-				//int tmp = position[l]; position[l] = position[r]; position[r] = tmp;
-				position[l] = i + 1; position[r] = i;
+				int tmp = position[l]; position[l] = position[r]; position[r] = tmp;
 
 				//System.err.println("Swapping " + l + " " + r);
 
@@ -199,34 +177,12 @@ public class ZigZagStrategySmall implements Strategy {
 			// permutation
 			mode = 0;
 		}
-		
 
 		// Move towards the target
 		for (int i = 0; i < d; ++ i)
 			instructions[i] = direction(subtract(target[i], dancers[i]));
 
 		return instructions;
-	}
-
-	// Soul mate origin and origin + 1, find an empty place after offset
-	private int settleSoulMate(int offset, int origin) {
-		int dst = -1;
-		for (int i = offset; i + 1 < round_table.length; i += 2) {
-			double dd = distance(round_table[origin][1], round_table[i][1]);
-			if (dst == -1 || dd < distance(round_table[origin][1], round_table[dst][1]))
-				dst = i;
-		}
-		//System.err.println("!" + origin + " " + dst + " " + distance(round_table[origin][1], round_table[dst][1]));
-		//System.err.println(distance(round_table[origin][1], round_table[dst][1]));
-		if (dst != -1 && occupier[dst] != -1) {
-			int k = settleSoulMate(dst + 2, dst);
-			if (k == -1) return -1;
-			target[occupier[dst]] = round_table[k][1];
-			target[occupier[dst + 1]] = round_table[k + 1][0];
-			occupier[k] = occupier[dst];
-			occupier[k + 1] = occupier[dst + 1];
-		}
-		return dst;
 	}
     
     private int total_enjoyment(int enjoyment_gained) {
@@ -249,7 +205,7 @@ public class ZigZagStrategySmall implements Strategy {
 	}
 
 	private void generate_round_table() {
-		int n = grid_size * grid_size;//number of grids
+		int n = grid_size * grid_size;
 		if (n % 2 == 1) n -= 1;
 
 		boolean[][] vis = new boolean[grid_size][grid_size];
@@ -260,7 +216,6 @@ public class ZigZagStrategySmall implements Strategy {
 		for (int round = 0; round < n; ++ round) {
 			vis[x][y] = true;
 
-			//close to left
 			round_table[round][0] = new Point(grid[x][y].x - cell_range * dx, grid[x][y].y - cell_range * dy);
 
 			// Turn
@@ -275,7 +230,6 @@ public class ZigZagStrategySmall implements Strategy {
 			}
 			x += dx; y += dy;
 
-			//close to right
 			round_table[round][1] = new Point(grid[x - dx][y - dy].x + cell_range * dx, grid[x - dx][y - dy].y + cell_range * dy);
 
 			/*
@@ -296,7 +250,8 @@ public class ZigZagStrategySmall implements Strategy {
 
 	private Point direction(Point a) {
 		double l = Math.hypot(a.x, a.y);
-		if (l <= 2 + 1e-8) return a;
+		if (l <= 1 + 1e-8) return a;
 		else return new Point(a.x / l, a.y / l);
 	}
 }
+	
