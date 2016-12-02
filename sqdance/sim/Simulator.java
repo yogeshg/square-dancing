@@ -28,7 +28,7 @@ class Simulator {
 	public static void main(String[] args) {
 
 		int friends = 10;
-		int participants = 4000;
+		int participants = 910;
 		boolean verbose = false;
 		int room_side = 20;
 		int turns = 1800;
