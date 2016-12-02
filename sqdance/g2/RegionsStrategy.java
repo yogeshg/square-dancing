@@ -74,10 +74,10 @@ public class RegionsStrategy implements Strategy {
 			
 			int next = i + 1;
 			if (next % IDLERS_IN_A_LINE == 0) {
-				current.x += IDLER_LINE_GAP;
-				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? 0 : DISTANCE_BETWEEN_IDLERS / 2;
+				current.x += IDLER_LINE_GAP + EPSILON;
+				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? 0 : DISTANCE_BETWEEN_IDLERS / 2 + EPSILON;
 			} else {
-				current.y += DISTANCE_BETWEEN_IDLERS;
+				current.y += DISTANCE_BETWEEN_IDLERS + EPSILON;
 			}
 		}
 		
@@ -118,10 +118,10 @@ public class RegionsStrategy implements Strategy {
 			
 			int next = i + 1;
 			if (next % IDLERS_IN_A_LINE == 0) {
-				current.x -= IDLER_LINE_GAP;
-				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? 0 : DISTANCE_BETWEEN_IDLERS / 2;
+				current.x -= IDLER_LINE_GAP + EPSILON;
+				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? 0 : DISTANCE_BETWEEN_IDLERS / 2 + EPSILON;
 			} else {
-				current.y += DISTANCE_BETWEEN_IDLERS;
+				current.y += DISTANCE_BETWEEN_IDLERS + EPSILON;
 			}
 		}
 		
@@ -147,7 +147,11 @@ public class RegionsStrategy implements Strategy {
 			return Vector.getPoints(generateMoveInstructions());
 		}
 		*/
-		return null;
+		Point[] ret = new Point[dancers.length];
+		for (int i = 0; i < ret.length; ++i) {
+			ret[i] = new Point(0,0);
+		}
+		return ret;
 	}
 
 	private boolean target_score_reached(int[] scores) {
