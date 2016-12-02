@@ -3,6 +3,7 @@ package sqdance.g2;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
 import sqdance.sim.Point;
 
@@ -51,6 +52,7 @@ public class RegionsStrategy implements Strategy {
         if (move_targets == null) {
             return null;
         }
+        Random r = new Random();
 
         // Move to the target locations as fast as possible
         Vector[] instructions = new Vector[d];
@@ -58,16 +60,30 @@ public class RegionsStrategy implements Strategy {
         double norm;
         for (int i = 0; i < d; ++i) {
         	difference = move_targets[i].add( dancer_locations.get(i).getVector().multiply(-1) );
+        	// if(i==1160) {
+        	// 	System.out.println(difference);
+        	// }
         	norm = difference.norm();
+
+
             if (norm - MOVE_DIST > MOVE_EPSILON) {
-            	if( Math.abs(difference.x) > Math.abs(difference.y) ) {
-            		difference.y = 0;
-            	} else {
-            		difference.x = 0;
-            	}
+            	// difference.x += 0.1 * r.nextDouble();
+            	// difference.y += 0.1 * r.nextDouble();
+            	// if( Math.abs(difference.x) > Math.abs(difference.y) ) {
+            	// 	difference.y = 0;
+            	// } else {
+            	// 	difference.x = 0;
+            	// }
             }
-            // TODO
-            difference.getLengthLimitedVector(MOVE_DIST - MOVE_EPSILON);
+
+
+        	// if(i==1160) {
+        	// 	System.out.println(difference);
+        	// }
+            difference = difference.getLengthLimitedVector(MOVE_DIST - MOVE_EPSILON);
+        	// if(i==1160) {
+        	// 	System.out.println(difference);
+        	// }
             instructions[i] = difference;
         }
 
@@ -83,8 +99,14 @@ public class RegionsStrategy implements Strategy {
         // System.out.println();
         // System.out.println();
         for(int i=0; i<d; ++i) {
+        	// if(i==1160) {
+        	// 	System.out.println(instructions[i] + " " + dancer_locations.get(i).getVector());
+        	// }
         	dancer_locations.get(i).getVector().x += instructions[i].x;
         	dancer_locations.get(i).getVector().y += instructions[i].y;
+        	// if(i==1160) {
+        	// 	System.out.println(instructions[i] + " " + dancer_locations.get(i).getVector());
+        	// }
         }
         return instructions;
     }
@@ -124,10 +146,11 @@ public class RegionsStrategy implements Strategy {
         	System.out.println("Migrating half region");
         	migration_size = (batch_size + d%batch_size)/2;
         }
-        // if (region1Size==0) {
-        // 	System.out.println("No need to migrate");
-        // 	migration_size = 0;
-        // }
+        if (region1Size==0) {
+        	System.out.println("No need to migrate");
+        	migration_size = 0;
+        	return;
+        }
         for(int i=0; i<migration_size; ++i) {
         	try {
 	        	d1_id = region1Dancers.get(region1Size-1);
@@ -150,11 +173,25 @@ public class RegionsStrategy implements Strategy {
         		break;
         	}
         }
+        for(int i=migration_size; i<batch_size; ++i) {
+        	// System.out.print(i+" ");
+        	d2_id = region2Dancers.get(i);
+        	move_target_ids_shifted.add(d2_id);
+        	move_targets[d2_id] = new Vector( move_targets[d2_id] );
+        }
+        // System.out.println();
     	double x_shift = x_min - x_max;
     	System.out.println(x_shift);
     	for(int id : move_target_ids_shifted) {
+    		// if(id==1160) {
+    		// 	System.out.println(move_targets[id]);
+    		// }
     		move_targets[id].x += x_shift;
+    		// if(id==1160) {
+    		// 	System.out.println(move_targets[id]);
+    		// }
     	}
+    	return;
     }
 
 	// YOGESH ZONE ENDS
@@ -176,8 +213,10 @@ public class RegionsStrategy implements Strategy {
 		 */
 		
 		int num_dancing_cols = (int) Math.ceil((18.8 - root3*DISTANCE_BETWEEN_IDLERS*d/400)
-											   / (root3*DISTANCE_BETWEEN_DANCERS/2 - root3*DISTANCE_BETWEEN_IDLERS/10))
-								 - 1;
+											   / (root3*DISTANCE_BETWEEN_DANCERS/2 - root3*DISTANCE_BETWEEN_IDLERS/10));
+		if( 1==(num_dancing_cols%2) ) {
+			num_dancing_cols-=1;
+		}
 		batch_size = 40 * num_dancing_cols;
 		num_batches = (int)Math.ceil(d * 1.0 / batch_size);
 		target_score = 500;
@@ -185,6 +224,7 @@ public class RegionsStrategy implements Strategy {
 		int dancers_in_round_1 = batch_size;
 		if (num_batches == 2) {
 			dancers_in_round_1 = d % 4 == 0 ? d/2 : d/2 + 1;
+			dancers_in_round_1 = ((int)Math.ceil(dancers_in_round_1/80))*80;
 		}
 		
 		/*

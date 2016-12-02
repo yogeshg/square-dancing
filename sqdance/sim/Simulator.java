@@ -280,21 +280,16 @@ class Simulator {
 					throw new IllegalArgumentException(i + ": Undefined movement x");
 				else if (Double.isNaN(m.y) || Double.isInfinite(m.y))
 					throw new IllegalArgumentException(i + ": Undefined movement y");
-				// else if (L[i].x + m.x < 0)
-				// throw new IllegalArgumentException(i + ": Invalid movement: x
-				// < 0");
-				// else if (L[i].y + m.y < 0)
-				// throw new IllegalArgumentException(i + ": Invalid movement: y
-				// < 0");
-				// else if (L[i].x + m.x > room_side)
-				// throw new IllegalArgumentException(i + ": Invalid movement: x
-				// > " + room_side);
-				// else if (L[i].y + m.y > room_side)
-				// throw new IllegalArgumentException(i + ": Invalid movement: y
-				// > " + room_side);
-				// else if (distance_gt(m, p_0, 2.0))
-				// throw new IllegalArgumentException(i + ": Invalid movement
-				// vector of " + m.x + "," + m.y);
+				else if (L[i].x + m.x < 0)
+				throw new IllegalArgumentException(i + ": Invalid movement: x < 0");
+				else if (L[i].y + m.y < 0)
+				throw new IllegalArgumentException(i + ": Invalid movement: y < 0");
+				else if (L[i].x + m.x > room_side)
+				throw new IllegalArgumentException(i + ": Invalid movement: x > " + room_side);
+				else if (L[i].y + m.y > room_side)
+				throw new IllegalArgumentException(i + ": Invalid movement: y > " + room_side);
+				else if (distance_gt(m, p_0, 2.0))
+				throw new IllegalArgumentException(i + ": Invalid movement vector of " + m.x + "," + m.y);
 				else
 					M[i] = m;
 			}
