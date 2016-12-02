@@ -7,7 +7,7 @@ import sqdance.sim.Point;
 
 public class RegionsStrategy implements Strategy {
 	
-	private static final double EPSILON = 0.00000001;
+	private static final double EPSILON = 0.0000001;
 	
 	private static final int DANCERS_IN_A_LINE = 40;
 	private static final int IDLERS_IN_A_LINE = 200;
@@ -75,7 +75,7 @@ public class RegionsStrategy implements Strategy {
 			int next = i + 1;
 			if (next % IDLERS_IN_A_LINE == 0) {
 				current.x += IDLER_LINE_GAP + EPSILON;
-				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? 0 : DISTANCE_BETWEEN_IDLERS / 2 + EPSILON;
+				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? 0 : DISTANCE_BETWEEN_IDLERS / 2;
 			} else {
 				current.y += DISTANCE_BETWEEN_IDLERS + EPSILON;
 			}
@@ -98,7 +98,8 @@ public class RegionsStrategy implements Strategy {
 			
 			int next = i + 1;
 			if (next % DANCERS_IN_A_LINE == 0) {
-				current.x += DANCER_LINE_GAP + EPSILON;
+				current.x += DANCER_LINE_GAP;
+				if (next % (2*DANCERS_IN_A_LINE) == 0) current.x += EPSILON;
 				current.y = next % (2*DANCERS_IN_A_LINE) == 0 ? EPSILON : DISTANCE_BETWEEN_DANCERS / 2;
 			} else {
 				current.y += DISTANCE_BETWEEN_DANCERS + EPSILON;
@@ -119,7 +120,7 @@ public class RegionsStrategy implements Strategy {
 			int next = i + 1;
 			if (next % IDLERS_IN_A_LINE == 0) {
 				current.x -= IDLER_LINE_GAP + EPSILON;
-				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? 0 : DISTANCE_BETWEEN_IDLERS / 2 + EPSILON;
+				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? EPSILON : DISTANCE_BETWEEN_IDLERS / 2;
 			} else {
 				current.y += DISTANCE_BETWEEN_IDLERS + EPSILON;
 			}
