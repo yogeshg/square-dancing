@@ -1,6 +1,7 @@
 package sqdance.g2;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import sqdance.sim.Point;
@@ -114,14 +115,21 @@ public class RegionsStrategy implements Strategy {
         for(int i=0; i<d; ++i) {
         	move_targets[i] = dancer_locations.get(i).getVector();
         }
+        double curr_x = 0.0;
+        double x_max = 0.0;
+        double x_min = 20.0;
+        HashSet<Integer> move_target_ids_shifted = new HashSet<Integer>();
         for(int i=0; i<batch_size; ++i) {
         	try {
 	        	d1_id = region1Dancers.get(region1Size-1);
 	        	d2_id = region2Dancers.get(i);
 	        	// d3_id = region3Dancers.get(i)
-	        	move_targets[d1_id] = new Vector( dancer_locations.get(d2_id).getVector()); // slightly left of this
+	        	curr_x = dancer_locations.get(d1_id).getVector().x;
+	        	x_max = Math.max(x_max, curr_x);
+	        	x_min = Math.min(x_min, curr_x);
+	        	move_targets[d1_id] = new Vector( dancer_locations.get(d2_id).getVector());
+	        	move_target_ids_shifted.add(d1_id); // slightly left of this
 	        	move_targets[d2_id] = new Vector( region3[region3size]);
-
 	        	region3Dancers.put(region3size, d2_id);
 	        	region2Dancers.remove(i);
 	        	region2Dancers.put(i, d1_id);
@@ -131,6 +139,11 @@ public class RegionsStrategy implements Strategy {
         	} catch (Exception e) {
         	}
         }
+    	double x_shift = x_min - x_max;
+    	System.out.println(x_shift);
+    	for(int id : move_target_ids_shifted) {
+    		move_targets[id].x += x_shift;
+    	}
     }
 
 	// YOGESH ZONE ENDS
