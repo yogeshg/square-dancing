@@ -98,18 +98,9 @@ public class ZigZagStrategyMedium implements Strategy {
 			final_positions[i] = locations[i];
 			locations[d - i - 1] = new Point(current.x + offx + EPSILON,
 					current.y + offy);
-			double dx = locations[i].x - locations[d-i-1].x;
-			double dy = locations[i].y - locations[d-i-1].y;
 
 			final_positions[d - i - 1] = locations[d - i - 1];
-			/*if(dir < 0) {
-				Point pos = locations[i];
-				locations[i] = new Point(locations[i].x, locations[d-1-i].y);
-				locations[d-1-i] = new Point(locations[d-1-i].x, pos.y);
-				final_positions[i] = locations[i];
-				final_positions[d-1-i] = locations[d-1-i];
-				
-			}*/
+		
 			if((i+1) % DANCERS_IN_A_LINE == 0) {
 				dir = -dir;
 				current = new Point(current.x, current.y + 2*offy + 2*EPSILON);

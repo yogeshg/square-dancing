@@ -1,6 +1,7 @@
 package sqdance.g2;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import sqdance.sim.Point;
@@ -22,6 +23,7 @@ public class RegionsStrategy implements Strategy {
 	private static final double IDLER_LINE_GAP = root3 / 2 * DISTANCE_BETWEEN_IDLERS;
 	
 	Vector[] region1;
+	int region1Size;
 	Vector[] region2;
 	Vector[] region3;
 
@@ -74,17 +76,17 @@ public class RegionsStrategy implements Strategy {
             instructions[i] = difference;
         }
 
-        for (int i = 0; i < d; i+=100) {
-        	System.out.print(move_targets[i]);
-        	System.out.print("\t");
-        }
-        System.out.println();
-        for (int i = 0; i < d; i+=100) {
-        	System.out.print(dancer_locations.get(i).getVector());
-        	System.out.print("\t");
-        }
-        System.out.println();
-        System.out.println();
+        // for (int i = 0; i < d; i+=100) {
+        // 	System.out.print(move_targets[i]);
+        // 	System.out.print("\t");
+        // }
+        // System.out.println();
+        // for (int i = 0; i < d; i+=100) {
+        // 	System.out.print(dancer_locations.get(i).getVector());
+        // 	System.out.print("\t");
+        // }
+        // System.out.println();
+        // System.out.println();
         for(int i=0; i<d; ++i) {
         	dancer_locations.get(i).getVector().x += instructions[i].x;
         	dancer_locations.get(i).getVector().y += instructions[i].y;
@@ -111,33 +113,58 @@ public class RegionsStrategy implements Strategy {
 
     // Set move target to the corresponding Point in the next tile
     private int region3size = 0;
+
     private void setMoveTargets() {
         move_targets = new Vector[d];
         int d1_id, d2_id, d3_id;
         for(int i=0; i<d; ++i) {
         	move_targets[i] = dancer_locations.get(i).getVector();
         }
-        for(int i=0; i<batch_size; ++i) {
-        	d1_id = region1Dancers.get(i);
-        	d2_id = region2Dancers.get(i);
-        	// d3_id = region3Dancers.get(i)
-        	move_targets[d1_id] = new Vector( dancer_locations.get(d2_id).getVector()); // slightly left of this
-        	move_targets[d2_id] = new Vector( region3[region3size++]);
-
-        	region3Dancers.put(i, d2_id);
-        	region2Dancers.remove(i);
-        	region2Dancers.put(i, d1_id);
-        	region1Dancers.remove(i);
+        double curr_x = 0.0;
+        double x_max = 0.0;
+        double x_min = 20.0;
+        HashSet<Integer> move_target_ids_shifted = new HashSet<Integer>();
+        int migration_size = batch_size;
+        if( region1Size < 2*batch_size ) {
+        	System.out.println("Migrating half region");
+        	migration_size = (batch_size + d%batch_size)/2;
         }
+        // if (region1Size==0) {
+        // 	System.out.println("No need to migrate");
+        // 	migration_size = 0;
+        // }
+        for(int i=0; i<migration_size; ++i) {
+        	try {
+	        	d1_id = region1Dancers.get(region1Size-1);
+	        	d2_id = region2Dancers.get(i);
+	        	// d3_id = region3Dancers.get(i)
+	        	curr_x = dancer_locations.get(d1_id).getVector().x;
+	        	x_max = Math.max(x_max, curr_x);
+	        	x_min = Math.min(x_min, curr_x);
+	        	move_targets[d1_id] = new Vector( dancer_locations.get(d2_id).getVector());
+	        	move_target_ids_shifted.add(d1_id); // slightly left of this
+	        	move_targets[d2_id] = new Vector( region3[region3size]);
+	        	region3Dancers.put(region3size, d2_id);
+	        	region2Dancers.remove(i);
+	        	region2Dancers.put(i, d1_id);
+	        	region1Dancers.remove(region1Size);
+	        	--region1Size;
+	        	++region3size;
+        	} catch (Exception e) {
+        		System.out.println("Exception in migration");
+        		break;
+        	}
+        }
+    	double x_shift = x_min - x_max;
+    	System.out.println(x_shift);
+    	for(int id : move_target_ids_shifted) {
+    		move_targets[id].x += x_shift;
+    	}
     }
 
 	// YOGESH ZONE ENDS
 
 
-
-
-	
-    
 	@Override
 	public Point[] generate_starting_locations(int d) {
 
@@ -192,6 +219,8 @@ public class RegionsStrategy implements Strategy {
 		for (int i = dancers_in_round_1; i < d; ++i) {
 			locations[i] = region1[i - dancers_in_round_1];
 			dancer_locations.put(i, new Location(region1, i - dancers_in_round_1));
+			++region1Size;
+
 			if (maxX < locations[i].x) {
 				maxX = locations[i].x;
 			}
@@ -210,6 +239,12 @@ public class RegionsStrategy implements Strategy {
 				current.y = next % (2*DANCERS_IN_A_LINE) == 0 ? EPSILON : DISTANCE_BETWEEN_DANCERS / 2;
 			} else {
 				current.y += DISTANCE_BETWEEN_DANCERS + EPSILON;
+			}
+			
+			// Splitting last column if there are odd number of columns
+			if (num_dancing_cols % 2 == 1 && next == batch_size - DANCERS_IN_A_LINE/2) {
+				current.x += DANCER_LINE_GAP;
+				current.y = DISTANCE_BETWEEN_DANCERS / 2;
 			}
 		}
 		
@@ -233,6 +268,8 @@ public class RegionsStrategy implements Strategy {
 			}
 		}
 		
+		if (num_dancing_cols % 2 == 1) num_dancing_cols++;
+		
 		return Vector.getPoints(locations);
 	}
 
@@ -251,7 +288,7 @@ public class RegionsStrategy implements Strategy {
 		if (isMovementComplete()) {
 			if (target_score_reached(scores)) {
 				setMoveTargets();
-				return play(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn, remainingEnjoyment);
+				return Vector.getPoints(generateMoveInstructions());
 			} else {
 				if(turnnum < STRANGER_DANCE_TURNS) {
 					
