@@ -28,6 +28,17 @@ public class Vector {
     public Point getPoint() {
         return new Point(x, y);
     }
+    
+    public static Point[] getPoints(Vector[] vectors) {
+    	int len = vectors.length;
+    	
+    	Point[] points = new Point[len];
+    	for (int i = 0; i < len; ++i) {
+    		points[i] = new Point(vectors[i].x, vectors[i].y);
+    	}
+    	
+    	return points;
+    }
 
     public Vector multiply(double d) {
         return new Vector(x * d, y * d);
@@ -36,15 +47,19 @@ public class Vector {
     public Vector add(Vector b) {
         return add(b.getPoint());
     }
+    
     public Vector add(Point b) {
         return new Vector(x+b.x, y+b.y);
     }
+    
     public Vector add(double x, double y) {
     	return new Vector(this.x + x, this.y + y);
     }
+    
     public Vector getUnitVector() {
     	return getLengthLimitedVector(1);
     }
+    
     public Vector getLengthLimitedVector(double l) {
     	double x = this.x,
     			y = this.y;
@@ -57,6 +72,7 @@ public class Vector {
 		
     	return new Vector(x, y);
     }
+    
     // public Vector unitVector() {
     //     final double t = norm();
     //     if (t < EPSILON){
@@ -96,10 +112,4 @@ public class Vector {
     public String toString() {
         return "("+String.format("%.2f", x)+","+String.format("%.2f", y)+")";
     }
-
-    public static void main(String[] args) {
-        Vector v;
-        return;
-    }
-
 }

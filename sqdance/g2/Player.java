@@ -64,7 +64,7 @@ public class Player implements sqdance.sim.Player {
 		else if (d <= d2)
 			strategy = new ZigZagStrategyMedium();
 		else
-			strategy = new ConveyerRowsStrategy();
+			strategy = new RegionsStrategy();
 	}
 
 	public Point[] generate_starting_locations() {

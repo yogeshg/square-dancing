@@ -8,7 +8,6 @@ public class ZigZagStrategySmall implements Strategy {
 	private static final double EPSILON = 0.00000001;
 	private static final double DISTANCE_BETWEEN_DANCERS = 0.51;
 	
-	//TODO: Set actual number (how many dancers are in each row)
 	private static final int DANCERS_IN_A_LINE = 40;
 	private int num_swaps;
 
@@ -34,7 +33,7 @@ public class ZigZagStrategySmall implements Strategy {
 					current.y + offy);
 			double dx = locations[i].x - locations[d-i-1].x;
 			double dy = locations[i].y - locations[d-i-1].y;
-			System.out.println("dist " + Math.sqrt(dx*dx + dy*dy));
+			//System.out.println("dist " + Math.sqrt(dx*dx + dy*dy));
 			final_positions[d - i - 1] = locations[d - i - 1];
 			/*if(dir < 0) {
 				Point pos = locations[i];
@@ -51,6 +50,10 @@ public class ZigZagStrategySmall implements Strategy {
 				current = new Point(current.x + dir * 2 * offx + dir*3*EPSILON, current.y);
 			}
 			
+		}
+		
+		for (Point p : locations) {
+			System.out.println(p);
 		}
 		
 		num_swaps = 0;

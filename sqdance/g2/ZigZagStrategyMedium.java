@@ -100,7 +100,7 @@ public class ZigZagStrategyMedium implements Strategy {
 					current.y + offy);
 			double dx = locations[i].x - locations[d-i-1].x;
 			double dy = locations[i].y - locations[d-i-1].y;
-			//System.out.println("dist " + Math.sqrt(dx*dx + dy*dy));
+
 			final_positions[d - i - 1] = locations[d - i - 1];
 			/*if(dir < 0) {
 				Point pos = locations[i];
@@ -120,9 +120,6 @@ public class ZigZagStrategyMedium implements Strategy {
 		}
 		
 		fake_cur_turn = 0;
-        // for(Point p:locations) {
-        //     System.out.println(p);
-        // }
 		return locations;
 	}
 	

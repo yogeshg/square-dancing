@@ -7,6 +7,18 @@ import sqdance.sim.Point;
 
 public class RegionsStrategy implements Strategy {
 	
+	private static final double EPSILON = 0.00000001;
+	
+	private static final int DANCERS_IN_A_LINE = 40;
+	private static final int IDLERS_IN_A_LINE = 200;
+	
+	private static final double root3 = Math.sqrt(3);
+	
+	private static final double DISTANCE_BETWEEN_DANCERS = 0.500001;
+	private static final double DANCER_LINE_GAP = root3 / 2 * DISTANCE_BETWEEN_DANCERS;
+	private static final double DISTANCE_BETWEEN_IDLERS = 0.1;
+	private static final double IDLER_LINE_GAP = root3 / 2 * DISTANCE_BETWEEN_IDLERS;
+	
 	Vector[] region1;
 	Vector[] region2;
 	Vector[] region3;
@@ -17,11 +29,97 @@ public class RegionsStrategy implements Strategy {
 	HashMap<Integer, Location> dancer_locations;
 
 	int batch_size;
+	int num_batches;
 	int target_score;
 	
 	@Override
 	public Point[] generate_starting_locations(int d) {
-		return null;
+		
+		Vector[] locations = new Vector[d];
+		dancer_locations = new HashMap<>();
+		
+		/*
+		 *  Calculate batch size and the target score
+		 */
+		
+		int num_dancing_cols = (int) Math.ceil((18.8 - root3*DISTANCE_BETWEEN_IDLERS*d/400)
+											   / (root3*DISTANCE_BETWEEN_DANCERS/2 - root3*DISTANCE_BETWEEN_IDLERS/10))
+								 - 1;
+		batch_size = 40 * num_dancing_cols;
+		num_batches = (int)Math.ceil(d * 1.0 / batch_size);
+		// TODO calculate target_score
+		
+		int dancers_in_round_1 = batch_size;
+		if (num_batches == 2) {
+			dancers_in_round_1 = d % 4 == 0 ? d/2 : d/2 + 1;
+		}
+		
+		/*
+		 * Make regions
+		 */
+		region1 = new Vector[d];
+		region2 = new Vector[batch_size];
+		region3 = new Vector[d];
+		
+		Vector current;
+		
+		// Region 1
+		current = new Vector(0, 0);
+		for (int i = 0; i < d; ++i) {
+			region1[i] = new Vector(current);
+			
+			int next = i + 1;
+			if (next % IDLERS_IN_A_LINE == 0) {
+				current.x += IDLER_LINE_GAP;
+				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? DISTANCE_BETWEEN_IDLERS / 2 : 0;
+			} else {
+				current.y += DISTANCE_BETWEEN_IDLERS;
+			}
+		}
+		
+		double maxX = 0;
+		for (int i = dancers_in_round_1; i < d; ++i) {
+			locations[i] = region1[i - dancers_in_round_1];
+			dancer_locations.put(i, new Location(region1, i - dancers_in_round_1));
+			if (maxX < locations[i].x) {
+				maxX = locations[i].x;
+			}
+		}
+		
+		// Region 2
+		current = new Vector(maxX + 0.6, 0);
+		for (int i = 0; i < batch_size; ++i) {
+			region2[i] = new Vector(current);
+			
+			int next = i + 1;
+			if (next % DANCERS_IN_A_LINE == 0) {
+				current.x += DANCER_LINE_GAP;
+				current.y = next % (2*DANCERS_IN_A_LINE) == 0 ? DISTANCE_BETWEEN_DANCERS / 2 : 0;
+			} else {
+				current.y += DISTANCE_BETWEEN_DANCERS;
+			}
+		}
+		
+		for (int i = 0; i < dancers_in_round_1; ++i) {
+			locations[i] = region2[i];
+			dancer_locations.put(i, new Location(region2, i));
+		}
+		
+		// Region 3
+		current = new Vector(20, 0);
+		for (int i = 0; i < d; ++i) {
+			region3[i] = new Vector(current);
+			
+			int next = i + 1;
+			if (next % IDLERS_IN_A_LINE == 0) {
+				current.x -= IDLER_LINE_GAP;
+				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? DISTANCE_BETWEEN_IDLERS / 2 : 0;
+			} else {
+				current.y += DISTANCE_BETWEEN_IDLERS;
+			}
+		}
+		
+		return Vector.getPoints(locations);
 	}
 
 	@Override
