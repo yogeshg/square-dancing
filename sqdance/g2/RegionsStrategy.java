@@ -75,7 +75,7 @@ public class RegionsStrategy implements Strategy {
 			int next = i + 1;
 			if (next % IDLERS_IN_A_LINE == 0) {
 				current.x += IDLER_LINE_GAP;
-				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? DISTANCE_BETWEEN_IDLERS / 2 : 0;
+				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? 0 : DISTANCE_BETWEEN_IDLERS / 2;
 			} else {
 				current.y += DISTANCE_BETWEEN_IDLERS;
 			}
@@ -92,16 +92,16 @@ public class RegionsStrategy implements Strategy {
 		}
 		
 		// Region 2
-		current = new Vector(maxX + 0.6, 0);
+		current = new Vector(maxX + 0.6, EPSILON);
 		for (int i = 0; i < batch_size; ++i) {
 			region2[i] = new Vector(current);
 			
 			int next = i + 1;
 			if (next % DANCERS_IN_A_LINE == 0) {
-				current.x += DANCER_LINE_GAP;
-				current.y = next % (2*DANCERS_IN_A_LINE) == 0 ? DISTANCE_BETWEEN_DANCERS / 2 : 0;
+				current.x += DANCER_LINE_GAP + EPSILON;
+				current.y = next % (2*DANCERS_IN_A_LINE) == 0 ? EPSILON : DISTANCE_BETWEEN_DANCERS / 2;
 			} else {
-				current.y += DISTANCE_BETWEEN_DANCERS;
+				current.y += DISTANCE_BETWEEN_DANCERS + EPSILON;
 			}
 		}
 		
@@ -119,7 +119,7 @@ public class RegionsStrategy implements Strategy {
 			int next = i + 1;
 			if (next % IDLERS_IN_A_LINE == 0) {
 				current.x -= IDLER_LINE_GAP;
-				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? DISTANCE_BETWEEN_IDLERS / 2 : 0;
+				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? 0 : DISTANCE_BETWEEN_IDLERS / 2;
 			} else {
 				current.y += DISTANCE_BETWEEN_IDLERS;
 			}
