@@ -22,6 +22,8 @@ public class RegionsStrategy implements Strategy {
 	Vector[] region1;
 	Vector[] region2;
 	Vector[] region3;
+
+	int d;
 	
 	HashMap<Integer, Integer> local_ids, actual_ids;
 	HashMap<Integer, Integer> region1Dancers, region2Dancers, region3Dancers;
@@ -32,9 +34,108 @@ public class RegionsStrategy implements Strategy {
 	int batch_size;
 	int num_batches;
 	int target_score;
+
+
+	// YOGESH ZONE STARTS
+
+    // Target position for each dancer, null if not in moving phase
+    private Vector[] move_targets;
+    private static double MOVE_DIST = 2.0;
+    private static double MOVE_EPSILON = 0.1;
+
+
+    // Uses dancer_locations and move_targets to come up with direction to move in each step
+    private Vector[] generateMoveInstructions() {
+        if (move_targets == null) {
+            return null;
+        }
+
+        // Move to the target locations as fast as possible
+        Vector[] instructions = new Vector[d];
+        Vector difference;
+        double norm;
+        for (int i = 0; i < d; ++i) {
+        	difference = move_targets[i].add( dancer_locations.get(i).getVector().multiply(-1) );
+        	norm = difference.norm();
+            if (norm - MOVE_DIST > MOVE_EPSILON) {
+            	if( Math.abs(difference.x) > Math.abs(difference.y) ) {
+            		difference.y = 0;
+            	} else {
+            		difference.x = 0;
+            	}
+            }
+            // TODO
+            difference.getLengthLimitedVector(MOVE_DIST - MOVE_EPSILON);
+            instructions[i] = difference;
+        }
+
+        for (int i = 0; i < d; i+=100) {
+        	System.out.print(move_targets[i]);
+        	System.out.print("\t");
+        }
+        System.out.println();
+        for (int i = 0; i < d; i+=100) {
+        	System.out.print(dancer_locations.get(i).getVector());
+        	System.out.print("\t");
+        }
+        System.out.println();
+        System.out.println();
+        for(int i=0; i<d; ++i) {
+        	dancer_locations.get(i).getVector().x += instructions[i].x;
+        	dancer_locations.get(i).getVector().y += instructions[i].y;
+        }
+        return instructions;
+    }
+
+    // If all dancers have reached target, return true Otherwise, return false
+    private boolean isMovementComplete() {
+    	// System.out.print("isMovementComplete:");
+		if(move_targets!=null) {
+	        for (int i = 0; i < d; ++i) {
+	            if (	dancer_locations.get(i).getVector().x != move_targets[i].x
+	            	||	dancer_locations.get(i).getVector().y != move_targets[i].y ) {
+			        // System.out.println("false");
+	                return false;
+	            }
+	        }
+	        move_targets=null;
+        }
+        // System.out.println("true");
+        return true;
+    }
+
+    // Set move target to the corresponding Point in the next tile
+    private int region3size = 0;
+    private void setMoveTargets() {
+        move_targets = new Vector[d];
+        int d1_id, d2_id, d3_id;
+        for(int i=0; i<d; ++i) {
+        	move_targets[i] = dancer_locations.get(i).getVector();
+        }
+        for(int i=0; i<batch_size; ++i) {
+        	d1_id = region1Dancers.get(i);
+        	d2_id = region2Dancers.get(i);
+        	// d3_id = region3Dancers.get(i)
+        	move_targets[d1_id] = new Vector( dancer_locations.get(d2_id).getVector()); // slightly left of this
+        	move_targets[d2_id] = new Vector( region3[region3size++]);
+
+        	region3Dancers.put(i, d2_id);
+        	region2Dancers.remove(i);
+        	region2Dancers.put(i, d1_id);
+        	region1Dancers.remove(i);
+        }
+    }
+
+	// YOGESH ZONE ENDS
+
+
+
+
 	
 	@Override
 	public Point[] generate_starting_locations(int d) {
+
+		this.d = d;
 		
 		Vector[] locations = new Vector[d];
 		dancer_locations = new HashMap<>();
@@ -61,9 +162,9 @@ public class RegionsStrategy implements Strategy {
 		/*
 		 * Make regions
 		 */
-		region1 = new Vector[d];
-		region2 = new Vector[batch_size];
-		region3 = new Vector[d];
+		region1 = new Vector[d];						// for all players
+		region2 = new Vector[batch_size];				// for only so many players
+		region3 = new Vector[d];						// for all players
 		
 		Vector current;
 		
@@ -137,22 +238,22 @@ public class RegionsStrategy implements Strategy {
 			this.target_score = (1800/num_batches - 9) * (20*(3+Player.f_estimate)/21);
 		}
 		
-		/*if (isMovementComplete()) {
-			if (target_score_reached(scores)) {
+		if (isMovementComplete()) {
+			if (4 == current_turn%5) {
 				setMoveTargets();
-				play(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn, remainingEnjoyment);
+				return play(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn, remainingEnjoyment);
 			} else {
+				Point[] instructions = new Point[d];
+				for(int i=0;i<d;++i) {
+					instructions[i] = new Point(0,0);
+				}
+				// System.out.println("x");
+				return instructions;
 				// TODO dance
 			}
 		} else {
 			return Vector.getPoints(generateMoveInstructions());
 		}
-		*/
-		Point[] ret = new Point[dancers.length];
-		for (int i = 0; i < ret.length; ++i) {
-			ret[i] = new Point(0,0);
-		}
-		return ret;
 	}
 
 	private boolean target_score_reached(int[] scores) {
