@@ -20,6 +20,7 @@ public class RegionsStrategy implements Strategy {
 	private static final double IDLER_LINE_GAP = root3 / 2 * DISTANCE_BETWEEN_IDLERS;
 	
 	Vector[] region1;
+	int region1Size;
 	Vector[] region2;
 	Vector[] region3;
 
@@ -106,6 +107,7 @@ public class RegionsStrategy implements Strategy {
 
     // Set move target to the corresponding Point in the next tile
     private int region3size = 0;
+
     private void setMoveTargets() {
         move_targets = new Vector[d];
         int d1_id, d2_id, d3_id;
@@ -113,16 +115,21 @@ public class RegionsStrategy implements Strategy {
         	move_targets[i] = dancer_locations.get(i).getVector();
         }
         for(int i=0; i<batch_size; ++i) {
-        	d1_id = region1Dancers.get(i);
-        	d2_id = region2Dancers.get(i);
-        	// d3_id = region3Dancers.get(i)
-        	move_targets[d1_id] = new Vector( dancer_locations.get(d2_id).getVector()); // slightly left of this
-        	move_targets[d2_id] = new Vector( region3[region3size++]);
+        	try {
+	        	d1_id = region1Dancers.get(region1Size-1);
+	        	d2_id = region2Dancers.get(i);
+	        	// d3_id = region3Dancers.get(i)
+	        	move_targets[d1_id] = new Vector( dancer_locations.get(d2_id).getVector()); // slightly left of this
+	        	move_targets[d2_id] = new Vector( region3[region3size]);
 
-        	region3Dancers.put(i, d2_id);
-        	region2Dancers.remove(i);
-        	region2Dancers.put(i, d1_id);
-        	region1Dancers.remove(i);
+	        	region3Dancers.put(region3size, d2_id);
+	        	region2Dancers.remove(i);
+	        	region2Dancers.put(i, d1_id);
+	        	region1Dancers.remove(region1Size);
+	        	--region1Size;
+	        	++region3size;
+        	} catch (Exception e) {
+        	}
         }
     }
 
@@ -183,6 +190,8 @@ public class RegionsStrategy implements Strategy {
 		for (int i = dancers_in_round_1; i < d; ++i) {
 			locations[i] = region1[i - dancers_in_round_1];
 			dancer_locations.put(i, new Location(region1, i - dancers_in_round_1));
+			++region1Size;
+
 			if (maxX < locations[i].x) {
 				maxX = locations[i].x;
 			}
@@ -244,7 +253,7 @@ public class RegionsStrategy implements Strategy {
 		if (isMovementComplete()) {
 			if (4 == current_turn%5) {
 				setMoveTargets();
-				return play(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn, remainingEnjoyment);
+				return Vector.getPoints(generateMoveInstructions());
 			} else {
 				Point[] instructions = new Point[d];
 				for(int i=0;i<d;++i) {
