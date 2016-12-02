@@ -29,7 +29,7 @@ public class Player implements sqdance.sim.Player {
 	// static int d1 = 2, d2 = 8;
 
 	// Estimated value of f from number of dancing pairs that are friends
-	int f_estimate;
+	static int f_estimate;
 	int friend_pairs_seen;
 
 	public int total_turns;

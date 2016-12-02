@@ -24,6 +24,7 @@ public class RegionsStrategy implements Strategy {
 	Vector[] region3;
 	
 	HashMap<Integer, Integer> local_ids, actual_ids;
+	HashMap<Integer, Integer> region1Dancers, region2Dancers, region3Dancers;
 	
 	// Uses global IDs
 	HashMap<Integer, Location> dancer_locations;
@@ -47,7 +48,7 @@ public class RegionsStrategy implements Strategy {
 								 - 1;
 		batch_size = 40 * num_dancing_cols;
 		num_batches = (int)Math.ceil(d * 1.0 / batch_size);
-		// TODO calculate target_score
+		target_score = 500;
 		
 		int dancers_in_round_1 = batch_size;
 		if (num_batches == 2) {
@@ -84,6 +85,7 @@ public class RegionsStrategy implements Strategy {
 			if (maxX < locations[i].x) {
 				maxX = locations[i].x;
 			}
+			region1Dancers.put(i - dancers_in_round_1, i);
 		}
 		
 		// Region 2
@@ -103,6 +105,7 @@ public class RegionsStrategy implements Strategy {
 		for (int i = 0; i < dancers_in_round_1; ++i) {
 			locations[i] = region2[i];
 			dancer_locations.put(i, new Location(region2, i));
+			region2Dancers.put(i, i);
 		}
 		
 		// Region 3
@@ -125,7 +128,32 @@ public class RegionsStrategy implements Strategy {
 	@Override
 	public Point[] play(Point[] dancers, int[] scores, int[] partner_ids, int[] enjoyment_gained, int[] soulmate,
 			int current_turn, int[][] remainingEnjoyment) {
+		
+		if (current_turn == 8) {
+			this.target_score = (1800/num_batches - 9) * (20*(3+Player.f_estimate)/21);
+		}
+		
+		if (isMovementComplete()) {
+			if (target_score_reached(scores)) {
+				setMoveTargets();
+				play(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn, remainingEnjoyment);
+			} else {
+				// TODO dance
+			}
+		} else {
+			return Vector.getPoints(generateMoveInstructions());
+		}
+		
 		return null;
+	}
+
+	private boolean target_score_reached(int[] scores) {
+		for (int i = 0; i < scores.length; ++i) {
+			if (dancer_locations.get(i).region.equals(region2) && scores[i] < target_score) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }
