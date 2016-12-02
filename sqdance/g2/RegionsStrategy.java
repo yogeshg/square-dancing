@@ -7,7 +7,7 @@ import sqdance.sim.Point;
 
 public class RegionsStrategy implements Strategy {
 	
-	private static final double EPSILON = 0.00000001;
+	private static final double EPSILON = 0.0000001;
 	
 	private static final int DANCERS_IN_A_LINE = 40;
 	private static final int IDLERS_IN_A_LINE = 200;
@@ -24,6 +24,8 @@ public class RegionsStrategy implements Strategy {
 	Vector[] region1;
 	Vector[] region2;
 	Vector[] region3;
+
+	int d;
 	
 	DancingTime dankDancers;
 	
@@ -37,8 +39,109 @@ public class RegionsStrategy implements Strategy {
 	int num_batches;
 	int target_score;
 	int num_dancing_cols;
+
+
+	// YOGESH ZONE STARTS
+
+    // Target position for each dancer, null if not in moving phase
+    private Vector[] move_targets;
+    private static double MOVE_DIST = 2.0;
+    private static double MOVE_EPSILON = 0.1;
+
+
+    // Uses dancer_locations and move_targets to come up with direction to move in each step
+    private Vector[] generateMoveInstructions() {
+        if (move_targets == null) {
+            return null;
+        }
+
+        // Move to the target locations as fast as possible
+        Vector[] instructions = new Vector[d];
+        Vector difference;
+        double norm;
+        for (int i = 0; i < d; ++i) {
+        	difference = move_targets[i].add( dancer_locations.get(i).getVector().multiply(-1) );
+        	norm = difference.norm();
+            if (norm - MOVE_DIST > MOVE_EPSILON) {
+            	if( Math.abs(difference.x) > Math.abs(difference.y) ) {
+            		difference.y = 0;
+            	} else {
+            		difference.x = 0;
+            	}
+            }
+            // TODO
+            difference.getLengthLimitedVector(MOVE_DIST - MOVE_EPSILON);
+            instructions[i] = difference;
+        }
+
+        for (int i = 0; i < d; i+=100) {
+        	System.out.print(move_targets[i]);
+        	System.out.print("\t");
+        }
+        System.out.println();
+        for (int i = 0; i < d; i+=100) {
+        	System.out.print(dancer_locations.get(i).getVector());
+        	System.out.print("\t");
+        }
+        System.out.println();
+        System.out.println();
+        for(int i=0; i<d; ++i) {
+        	dancer_locations.get(i).getVector().x += instructions[i].x;
+        	dancer_locations.get(i).getVector().y += instructions[i].y;
+        }
+        return instructions;
+    }
+
+    // If all dancers have reached target, return true Otherwise, return false
+    private boolean isMovementComplete() {
+    	// System.out.print("isMovementComplete:");
+		if(move_targets!=null) {
+	        for (int i = 0; i < d; ++i) {
+	            if (	dancer_locations.get(i).getVector().x != move_targets[i].x
+	            	||	dancer_locations.get(i).getVector().y != move_targets[i].y ) {
+			        // System.out.println("false");
+	                return false;
+	            }
+	        }
+	        move_targets=null;
+        }
+        // System.out.println("true");
+        return true;
+    }
+
+    // Set move target to the corresponding Point in the next tile
+    private int region3size = 0;
+    private void setMoveTargets() {
+        move_targets = new Vector[d];
+        int d1_id, d2_id, d3_id;
+        for(int i=0; i<d; ++i) {
+        	move_targets[i] = dancer_locations.get(i).getVector();
+        }
+        for(int i=0; i<batch_size; ++i) {
+        	d1_id = region1Dancers.get(i);
+        	d2_id = region2Dancers.get(i);
+        	// d3_id = region3Dancers.get(i)
+        	move_targets[d1_id] = new Vector( dancer_locations.get(d2_id).getVector()); // slightly left of this
+        	move_targets[d2_id] = new Vector( region3[region3size++]);
+
+        	region3Dancers.put(i, d2_id);
+        	region2Dancers.remove(i);
+        	region2Dancers.put(i, d1_id);
+        	region1Dancers.remove(i);
+        }
+    }
+
+	// YOGESH ZONE ENDS
+
+
+
+
+	
+    
 	@Override
 	public Point[] generate_starting_locations(int d) {
+
+		this.d = d;
 		
 		Vector[] locations = new Vector[d];
 		dancer_locations = new HashMap<>();
@@ -65,9 +168,9 @@ public class RegionsStrategy implements Strategy {
 		/*
 		 * Make regions
 		 */
-		region1 = new Vector[d];
-		region2 = new Vector[batch_size];
-		region3 = new Vector[d];
+		region1 = new Vector[d];						// for all players
+		region2 = new Vector[batch_size];				// for only so many players
+		region3 = new Vector[d];						// for all players
 		
 		Vector current;
 		
@@ -78,10 +181,10 @@ public class RegionsStrategy implements Strategy {
 			
 			int next = i + 1;
 			if (next % IDLERS_IN_A_LINE == 0) {
-				current.x += IDLER_LINE_GAP;
-				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? DISTANCE_BETWEEN_IDLERS / 2 : 0;
+				current.x += IDLER_LINE_GAP + EPSILON;
+				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? 0 : DISTANCE_BETWEEN_IDLERS / 2;
 			} else {
-				current.y += DISTANCE_BETWEEN_IDLERS;
+				current.y += DISTANCE_BETWEEN_IDLERS + EPSILON;
 			}
 		}
 		
@@ -96,16 +199,17 @@ public class RegionsStrategy implements Strategy {
 		}
 		
 		// Region 2
-		current = new Vector(maxX + 0.6, 0);
+		current = new Vector(maxX + 0.6, EPSILON);
 		for (int i = 0; i < batch_size; ++i) {
 			region2[i] = new Vector(current);
 			
 			int next = i + 1;
 			if (next % DANCERS_IN_A_LINE == 0) {
 				current.x += DANCER_LINE_GAP;
-				current.y = next % (2*DANCERS_IN_A_LINE) == 0 ? DISTANCE_BETWEEN_DANCERS / 2 : 0;
+				if (next % (2*DANCERS_IN_A_LINE) == 0) current.x += EPSILON;
+				current.y = next % (2*DANCERS_IN_A_LINE) == 0 ? EPSILON : DISTANCE_BETWEEN_DANCERS / 2;
 			} else {
-				current.y += DISTANCE_BETWEEN_DANCERS;
+				current.y += DISTANCE_BETWEEN_DANCERS + EPSILON;
 			}
 		}
 		
@@ -122,10 +226,10 @@ public class RegionsStrategy implements Strategy {
 			
 			int next = i + 1;
 			if (next % IDLERS_IN_A_LINE == 0) {
-				current.x -= IDLER_LINE_GAP;
-				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? DISTANCE_BETWEEN_IDLERS / 2 : 0;
+				current.x -= IDLER_LINE_GAP + EPSILON;
+				current.y = next % (2*IDLERS_IN_A_LINE) == 0 ? EPSILON : DISTANCE_BETWEEN_IDLERS / 2;
 			} else {
-				current.y += DISTANCE_BETWEEN_IDLERS;
+				current.y += DISTANCE_BETWEEN_IDLERS + EPSILON;
 			}
 		}
 		
@@ -147,7 +251,7 @@ public class RegionsStrategy implements Strategy {
 		if (isMovementComplete()) {
 			if (target_score_reached(scores)) {
 				setMoveTargets();
-				play(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn, remainingEnjoyment);
+				return play(dancers, scores, partner_ids, enjoyment_gained, soulmate, current_turn, remainingEnjoyment);
 			} else {
 				if(turnnum < STRANGER_DANCE_TURNS) {
 					
@@ -181,28 +285,96 @@ public class RegionsStrategy implements Strategy {
 		int d = region2Dancers.size();
 		int[] newregion2dancers = new int[d];
 		int[] ids = new int[d];
+		System.out.println(d);
+		//int current = 0;
+		int maxcol = d/(2*DANCERS_IN_A_LINE);
 		for(int i = 0 ; i < region2Dancers.size(); ++i) {
+			int next = -1;
+			int col = i / (2 *DANCERS_IN_A_LINE);
+			int row = i % (2*DANCERS_IN_A_LINE);
+			int col2 = 0;
+			if(row >= DANCERS_IN_A_LINE) {
+				row -= DANCERS_IN_A_LINE;
+				col2 = 1;
+			}
+			if(col2 == col % 2 && row != DANCERS_IN_A_LINE - 1) {
+				next = i + 1;
+			} else if(col2 == col % 2) {
+				if(col2 == 0) {
+					if(col == maxcol-1) {
+						next = i + DANCERS_IN_A_LINE;
+					} else {
+						next = i + 2 * DANCERS_IN_A_LINE;
+					}
+				} else {
+					next = i - 2 * DANCERS_IN_A_LINE;
+				}
+			} else if(col2 != col % 2 && row != 0) {
+				next = i - 1;
+			} else if(col2 != col % 2) {
+				if(col2 == 0) {
+					if(col == maxcol-1) {
+						next = i + DANCERS_IN_A_LINE;
+					} else {
+						next = i + 2 * DANCERS_IN_A_LINE;
+					}
+				} else {
+					if(col == 0) {
+						next = i - DANCERS_IN_A_LINE;
+					} else {
+						next = i - 2 * DANCERS_IN_A_LINE;
+					}
+				}
+			}
+			/*if(col == d / (2*DANCERS_IN_A_LINE)) {
+				int num = d % (2 * DANCERS_IN_A_LINE);
+				int row = i % (2 * DANCERS_IN_A_LINE);
+				int col2 = 0;
+				if(row >= num/2) {
+					row -= num/2;
+					col2 = 1;
+				}
+				if(col2 == 1 && row == 0) {
+					next = current - 2 * DANCERS_IN_A_LINE;
+				} else if(col2 == 1) {
+					next = current - 1;
+				} else if(col2 == 0 && row == num/2 - 1) {
+					next = current + DANCERS_IN_A_LINE;
+				} else if(col2 == 0) {
+					next = current + 1;
+				}
+			} else {
+				int row = i % (2*DANCERS_IN_A_LINE);
+				int col2 = 0;
+				if(row >= DANCERS_IN_A_LINE/2) {
+					row -= DANCERS_IN_A_LINE/2;
+					col2 = 1;				
+				}
+				int maxcol = d/(2*DANCERS_IN_A_LINE);
+				int dir = -1;
+				if(col % 2 == maxcol % 2) {
+					dir = 1;
+				}	
+				if(col2 == 0 && ) {
+					next = current - 2 * DANCERS_IN_A_LINE;
+				} else if(col2 == maxcol % 2) {
+					next = current - 1;
+				} else if(col2 != maxcol % 2 && row == num/2 - 1) {
+					next = current + DANCERS_IN_A_LINE;
+				} else if(col2 != maxcol % 2) {
+					next = current + 1;
+				}
+			}*/
 			int id = region2Dancers.get(i);
 			ids[i] = id;
 			Point location = dancer_locations.get(id).getVector().getPoint();
-			int next = -1;
-			if(i + 1 < DANCERS_IN_A_LINE) {
-				next = i + 1;
-			} else if(i == DANCERS_IN_A_LINE ) {
-				next = i - DANCERS_IN_A_LINE;
-			} else if(i == DANCERS_IN_A_LINE - 1) {
-				next = i + DANCERS_IN_A_LINE;
-			} else if((i% DANCERS_IN_A_LINE) % 2 == 0 && i/DANCERS_IN_A_LINE != 1) {
-				next = i - DANCERS_IN_A_LINE;
-			} else if((i % DANCERS_IN_A_LINE) % 2 == 1 && i/DANCERS_IN_A_LINE != num_dancing_cols - 1){
-				next = i + DANCERS_IN_A_LINE;
-			} else {
-				next = i - 1;
-			}
+			
+			//System.out.println(i + " -> " + next);
 			int id2 = region2Dancers.get(next);
 			Point location2 = dancer_locations.get(id2).getVector().getPoint();
 			instructions[id] = getDirection(location, location2);
 			newregion2dancers[next] = id;
+			//current = next;
 		}
 		
 		//r2d

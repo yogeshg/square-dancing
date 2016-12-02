@@ -59,6 +59,10 @@ public class Vector {
     public Vector getUnitVector() {
     	return getLengthLimitedVector(1);
     }
+
+    public double norm() {
+        return Math.hypot(x, y);
+    }
     
     public Vector getLengthLimitedVector(double l) {
     	double x = this.x,
