@@ -1,7 +1,20 @@
 \section{Strategies and Justification}
-\subsection{Used Strategies}
-\subsubsection{Largest Angle}
-When a friendly cell is being encroached by other cells or enemy pheromones, it must decide how best to move, because otherwise it will no longer be able to grow and reproduce. One of the first successful ideas we pursued in this project was the strategy of moving friendly cells toward the least inhibited path using a “largest angle” metric.
+A key idea that our group (and all other groups) used is to separate the strategies based on how many people are on the dance floor. However, some ideas like Hexagonal Packing are used regardless of how many dancers are present. We explain each strategy used and under what situations we used them.
+\subsection{Small d - Finding all soulmates}
+This is a strategy that all groups eventually converged to for small values of d. We believe that the case where d is small is “solved” in that there is no strategy better than this except for small optimizations. The key idea here is to find all dancers' soulmates. The reasoning behind this is that dancing with your soulmate gets you more points and for small values of d it's optimal to find your soulmates in the least amount of time and then dance with them. Our implementation of this is similar to group 6's implementation.\\
+We start by placing the dancers in a spiral around the edges of the dance floor and leaving the centre empty. Whenever a dancer finds its soulmate, the pair leaves the dance area and goes to the centre and continues dancing there forever. \\
+Note that for this idea to work, every dancer has to dance with every other dancer, otherwise there would be a possibility that some dancer would not find its soulmate and then the minimum score would be affected by this dancer which would hurt the overall score. \\
+\subsubsection{The Basic Implementation}
+To do this, we first place the dancers in a pairwise topology, with dancer i paired off with dancer d+1-i. Then we simply move every dancer i to the position of dancer i+1, with dancer d moving to dancer 1's location. It's easy to see that while a lot of pairs do dance together, the only pairs that dance are (i,j) where one of i and j is even and the other is odd. Most groups implemented this for their first deliverable, but our group was one of the two groups (along with group 6) that was able to fix this for our first deliverable with the change shown in the figure.\\
+\subsubsection{Making All Pairs Dance}
+To make even numbered dancers dance with other evens and odds with odds, we introduce a separate waiting position on the far right. On each step, instead of i going to i+1, only the dancers on the first row move one step to the right. Then we have odds and odds and evens dancing with evens. On the next step, we move the dancer on the waiting position (4 in the figure) and the dancers on the bottom row (except the dancer that is alone) to the location of dancer i+1. The dancer that is alone then moves to the location that was previously the top left corner. This introduces new dancing pairs between every turn of the previous strategy and it is easy to see that a dancer i that danced with a dancer j on one turn will on its next turn dance with dancer j-1. If j = i +1, which means that j-1 = i, on the next turn the dancer will just dance by itself. Since each dancer iterates through all the other dancers, every pair of dancers must eventually dance with each other.\\
+Note that this is slightly more efficient if we use a geometry which closes the loop formed by the topology, making 4 and 8 dance with each other. In our current algorithm, on average two dancers do not dance every two turns. This means that the closed loop would only improve the score by a factor of only $\frac{1}{d}$ and we felt that we could improve our strategy in other areas instead.\\
+\subsubsection{Flattening the Topology}
+The difference between our and group 6's deliverable is that they flattened their topology; where two dancers were on opposite sides for our strategy, they were adjacent in group 6's. We later modified our strategy to do the same, because it made modification of the geometry easier to implement.\\
+\subsubsection{The Geometry}
+Our initial geometry was a circular spiral, because we thought that it would be an efficient way to pack the dancers, but we were wrong and we ended up using a rectangular spiral. The reasoning for a rectangular spiral is that pairs of dancers that have already danced have fewer movements to reach the center where they can dance forever.\\
+\subsubsection{Removing Soulmate Pairs}
+The final optimization we used was to make dancers who had found their soulmates leave the geometry. Our initial idea was to make all pairs dance and then pair them off. It turned out that removing them as soon as they found their soulmates was faster at pairing them and led to a higher score so we added that in.\\
 
 \begin{figure}[h]
 \center
@@ -10,24 +23,9 @@ When a friendly cell is being encroached by other cells or enemy pheromones, it 
 \label{fig:angle}
 \end{figure}
 
-This strategy is demonstrated in the above figure, where the friendly cell is represented as a blue circle, and other cells or enemy pheromones are represented as red circles. The selected path (represented by a green arrow) is the path at the midpoint of the angle between the two cells or enemy pheromones with the largest angle.
 \\
 \\
 
-The basic algorithm employed for this strategy is as follows: \\
-\begin{enumerate}
-    \item If there is exactly one other cell or enemy pheromone within the view distance, have the friendly cell move in the direction directly opposite the other cell or pheromone.\\
-    \item Else if there are multiple cells or enemy pheromones (we’ll call them enemy “units”) within the view distance of a friendly cell, there is an angle between every pair of units. Find all of these angles, and then find the largest of these angles. Have the friendly cell move in the direction of the midpoint of the two units that create this largest angle.
-\end{enumerate}
-
-
-
-
-This strategy by itself provided very good results when competing with the default player, and was also the winning player in the class discussion where we first introduced it. Many other groups later adopted variations on this strategy in their players.\\
-\\
-
-One legitimate concern with this strategy is that game configurations with large values for d may cause the player to evaluate too many angles and overlook paths that are actually not that inhibitive. To combat this, we opted to restrict the view to a variable. We start the variable at 1mm and increase it in steps of 0.5mm until a max of 5mm. We stop when we are able to see a cell and thus make a decision on which direction to travel.\\
-\\
 
 \begin{figure}[h]
 \center
@@ -35,10 +33,10 @@ One legitimate concern with this strategy is that game configurations with large
 \caption{}
 \label{fig:angle2}
 \end{figure}
-The above figure demonstrates the benefit of this view restriction. The pink cell is visible within the d of the game, but if the player considers it when making the determination of the largest angle, a less optimal direction may be chosen.\\
-This “largest angle” strategy serves as the foundation for the early game strategy in our final player. It is robust enough in to keep up with the rest of the groups for the first few generations of reproduction even when being encroached by other cells, and it works well as a means of creating distance between friendly cells to maximize reproductive potential.\\
 
-\subsubsection{Motionless by Default}
+\subsection{Medium d - dance then move}
+It is clear that finding all soulmates cannot work for every value of d because there is only limited time and the opportunity cost of searching for soulmates begins to outweigh the potential benefits of finding soulmates. We discuss the exact d that we chose as the upper bound for using the soulmate strategy in the parameter tuning section.\\
+
 For much of our development process, we adopted the strategy that most groups did whereby our cells constantly moved across the board. This worked moderately well as a way to explore empty space, but we noticed that this strategy fell apart in the later stages of the game. Our blind exploration strategy was overshadowed by other groups and their clustering strategies which were able to claim more space without needing to explore all of the empty space available on the board. In the last two weeks of the project, we moved to a strategy where our cells were motionless by default. This strategy was first adopted by Group 1 as a means of naturally clustering without developing a sophisticated clustering algorithm.\\\\
 We took Group 1’s basic principle and expanded upon it by creating a heuristic known as the “safe range”, which is the distance that friendly cells should ideally maintain between each other in this cluster. To make our initial cluster harder to penetrate, we wanted to limit this gap, but to make our cluster larger, we wanted to maximize this gap. This tradeoff is explained in more detail in the Parameter Tuning section where we justify the final chosen heuristic.\\\\
 To execute this “safe range” heuristic, we simply employed the Largest Angle strategy discussed in the previous subsection, and set the restricted view distance to our “safe range” heuristic. By setting the restricted view distance to our “safe range” heuristic, the Largest Angle strategy in conjunction with keeping cells motionless by default naturally created a cluster of cells that were separated by no more than this “safe range”.\\\\
