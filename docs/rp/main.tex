@@ -6,7 +6,11 @@
 \usepackage{tabularx}
 \usepackage{amsmath,amssymb}
 \usepackage{hyperref}
-
+\usepackage{longtable}
+\usepackage{booktabs}
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+  
 \title{Project 3: The Future of Square Dancing}
 \author{{\bf Group 2:} Rajan Bhargava, Yogesh Garg, Kailash Meiyappan}
 \date{December 2016}
@@ -15,16 +19,16 @@
 \maketitle
 \clearpage
 \tableofcontents
-\clearpage
-\input{intro.tex}
+% \clearpage
+% \input{intro.tex}
 \clearpage
 \input{strats.tex}
 \clearpage
 \input{parameters.tex}
 \clearpage
-\input{tournamenta.tex}
-\clearpage
-\input{future.tex}
-\input{Conclusions.tex}
+\input{tournament-analysis}
+% \clearpage
+% \input{future.tex}
+% \input{Conclusions.tex}
 \input{acknowledgement.tex}
 \end{document}
