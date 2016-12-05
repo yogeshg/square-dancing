@@ -4,11 +4,24 @@ A key idea that our group (and all other groups) used is to separate the strateg
 This is a strategy that all groups eventually converged to for small values of d. We believe that the case where d is small is “solved” in that there is no strategy better than this except for small optimizations. The key idea here is to find all dancers' soulmates. The reasoning behind this is that dancing with your soulmate gets you more points and for small values of d it's optimal to find your soulmates in the least amount of time and then dance with them. Our implementation of this is similar to group 6's implementation.\\
 We start by placing the dancers in a spiral around the edges of the dance floor and leaving the centre empty. Whenever a dancer finds its soulmate, the pair leaves the dance area and goes to the centre and continues dancing there forever. \\
 Note that for this idea to work, every dancer has to dance with every other dancer, otherwise there would be a possibility that some dancer would not find its soulmate and then the minimum score would be affected by this dancer which would hurt the overall score. \\
+\begin{figure}[h]
+\center
+\includegraphics[scale=0.5]{soulmatesfound.png}
+\caption{The dance floor after all soulmates have been paired off}
+\label{fig:soulmates found}
+\end{figure}
+
 \subsubsection{The Basic Implementation}
 To do this, we first place the dancers in a pairwise topology, with dancer i paired off with dancer d+1-i. Then we simply move every dancer i to the position of dancer i+1, with dancer d moving to dancer 1's location. It's easy to see that while a lot of pairs do dance together, the only pairs that dance are (i,j) where one of i and j is even and the other is odd. Most groups implemented this for their first deliverable, but our group was one of the two groups (along with group 6) that was able to fix this for our first deliverable with the change shown in the figure.\\
 \subsubsection{Making All Pairs Dance}
 To make even numbered dancers dance with other evens and odds with odds, we introduce a separate waiting position on the far right. On each step, instead of i going to i+1, only the dancers on the first row move one step to the right. Then we have odds and odds and evens dancing with evens. On the next step, we move the dancer on the waiting position (4 in the figure) and the dancers on the bottom row (except the dancer that is alone) to the location of dancer i+1. The dancer that is alone then moves to the location that was previously the top left corner. This introduces new dancing pairs between every turn of the previous strategy and it is easy to see that a dancer i that danced with a dancer j on one turn will on its next turn dance with dancer j-1. If j = i +1, which means that j-1 = i, on the next turn the dancer will just dance by itself. Since each dancer iterates through all the other dancers, every pair of dancers must eventually dance with each other.\\
 Note that this is slightly more efficient if we use a geometry which closes the loop formed by the topology, making 4 and 8 dance with each other. In our current algorithm, on average two dancers do not dance every two turns. This means that the closed loop would only improve the score by a factor of only $\frac{1}{d}$ and we felt that we could improve our strategy in other areas instead.\\
+\begin{figure}[h]
+\center
+\includegraphics[scale=0.5]{AllDancePairs.png}
+\caption{We have three steps. On the left we do not use the fix and only odd-even pairs dance. On the right, we use the fix and even-even pairs and odd-odd pairs also dance}
+\label{fig:All pairs dancing}
+\end{figure}
 \subsubsection{Flattening the Topology}
 The difference between our and group 6's deliverable is that they flattened their topology; where two dancers were on opposite sides for our strategy, they were adjacent in group 6's. We later modified our strategy to do the same, because it made modification of the geometry easier to implement.\\
 \subsubsection{The Geometry}
@@ -19,9 +32,9 @@ The final optimization we used was to make dancers who had found their soulmates
 
 \begin{figure}[h]
 \center
-\includegraphics[scale=1]{angle2.png}
+\includegraphics[scale=0.5]{smalld.png}
 \caption{}
-\label{fig:angle2}
+\label{fig:small d}
 \end{figure}
 
 \subsection{Medium d - dance then move}
@@ -33,5 +46,18 @@ An interesting feature of this strategy is that the score we get is independent 
 The upper bound of d for this strategy is simply the number of dancers that can fit on the dance floor in such a way that everyone can dance.\\
 Naturally, we can increase this value by using a more efficient packing. We can think of dancers as circles of radius 0.25 because our goal is that no two dancers are at a distance less than 0.5 from each other.\\
 The most efficient way to pack circles is with hexagonal packing. As shown in the figure, this takes up less room per row of dancers. For ordinary square packing, we can fit 40 dancers per row and 40 columns for a maximum of 1600 dancers. With hexagonal packing, the space we save allows us to fit 6 more rows of 40 dancers, leading to an upper bound of 1840. This is the largest number of dancers that can dance on the dance floor at one time. We ended up using square packing upto 1600 and then hexagonal packing upto 1840, because our implementation of hexagonal packing had dancers at each end not dancing, which made square packing better if both would fit.\\
+\begin{figure}[h]
+\center
+\includegraphics[scale=0.5]{squarepack.png}
+\caption{Square packing with 1600 dancers}
+\label{fig:Square Packing}
+\end{figure}
+\\
+\begin{figure}[h]
+\center
+\includegraphics[scale=0.5]{hex.png}
+\caption{Hexagonal packing with 1840 dancers}
+\label{fig:Hexagonal Packing}
+\end{figure}
 \subsubsection{Friend Estimation}
 On any given turn, we can look at the number of pairs of friends dancing to estimate the true value of f. The probability of a certain dancer dancing with a friend is $\frac{f}{d-1}$, since of the d-1 other dancers, there are f friends. We treat this as a binomial distribution and an estimate for the probability is thus $\hat{f} = \frac{dancers\ dancing\ with\ a\ friend}{d}$. The only problem is that we were unable to find a good way to use it for medium d values.\\
