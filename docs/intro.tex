@@ -1,0 +1,37 @@
+\documentclass[a4paper,11pt,titlepage]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{setspace}
+\usepackage{changepage}
+\usepackage{mathtools}
+\usepackage[sorting=nyt,backend=bibtex,citestyle=authoryear]{biblatex}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\usepackage{cancel}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[colorlinks=true,linkcolor=blue]{hyperref}
+
+\begin{document}
+
+\section{Introduction}
+
+\textbf{The future of square dancing} is a problem that calls for many different strategies based on the configuration of the simulation. It requires strategies that optimize multiple factors, with each configuration involving optimization on a subset of these factors. 
+
+For example, when there are very few dancers to account for, it makes sense to find soulmates as quickly as possible and pair them up to dance with each other. This would maximize the minimum score in this configuration. We also need to worry about how to make every person dance with every other person using minimum number of turns, which is a problem by itself.
+
+When there are more players such that finding each person's soulmate is no longer viable, we need to focus on other ways of increasing the score, which could be to either minimize the number of movements each player makes, or to use friends to increase the score and dance longer.
+
+Then comes the factor of packing dancers on the dance floor so that everyone can dance. Using a square grid with dancers on vertices will not work if there are more than 1600 dancers. This calls for a different system of packing, the answer to which is a hexagonal grid, a honeycomb-like pattern.
+
+These strategies still do not address the problem where all dancers cannot be placed so that they all dance. The honeycomb structure is unable to address configurations where the number of players is greater than 1840, and the problem now is to find a strategy that attempts to have as large a number of dancing people at every turn as possible. This strategy also needs to be able to distribute this score across all dancers since we are scored based on the happiness of the dancer with the least score.
+
+Thus, any dance caller needs to address a lot of different subsets of problems based on the configuration, and there are a lot of details that need to be taken care of, especially since we need to raise the scores of all dancers simultaneously. In our report, we address each of these problems and how we attempted to solve them and implement a good dance calling strategy. We see in our results that we perform well when compared to other groups in most configurations, with very few exceptions.
+
+\end{document}
