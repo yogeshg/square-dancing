@@ -99,5 +99,17 @@
 ## Performance in Large category
 * For Large category, our strategy has step behavior
 * g7 seems to have a more continuous looking behavior
-* Present the values of number of dancers vs maximum dancers without creating claustrophobia
+<!-- * Present the values of number of dancers vs maximum dancers without creating claustrophobia -->
 
+| friends | batch size | num batches | target score | num dancing cols |
+|--------:|-----------:|------------:|-------------:|-----------------:|
+|    3200 |        1680|            2|          2545|                42|
+|    6400 |        1520|            5|          1002|                38|
+|    12800|        1280|           10|           439|                32|
+|    25600|         720|           36|           105|                18|
+
+* claustrophobia to mitigate: -50 = 16 turns
+* target score: 105 = 35 turns
+* 50 turns for dancing per batch
+* 10 turns for moving per batch
+* 1800 / 60 = 30 batches can be handled

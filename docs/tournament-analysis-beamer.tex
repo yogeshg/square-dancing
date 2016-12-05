@@ -235,10 +235,103 @@
 \item
   For Large category, our strategy has step behavior
 \item
-  g7 seems to have a more continuous looking behavior
+  g7 seems to have a more continuous looking behavior 
+\end{itemize}
+
+\begin{longtable}[c]{@{}rrrrr@{}}
+\toprule
+\begin{minipage}[b]{0.12\columnwidth}\raggedleft\strut
+friends
+\strut\end{minipage} &
+\begin{minipage}[b]{0.16\columnwidth}\raggedleft\strut
+batch size
+\strut\end{minipage} &
+\begin{minipage}[b]{0.17\columnwidth}\raggedleft\strut
+num batches
+\strut\end{minipage} &
+\begin{minipage}[b]{0.18\columnwidth}\raggedleft\strut
+target score
+\strut\end{minipage} &
+\begin{minipage}[b]{0.23\columnwidth}\raggedleft\strut
+num dancing cols
+\strut\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.12\columnwidth}\raggedleft\strut
+3200
+\strut\end{minipage} &
+\begin{minipage}[t]{0.16\columnwidth}\raggedleft\strut
+1680
+\strut\end{minipage} &
+\begin{minipage}[t]{0.17\columnwidth}\raggedleft\strut
+2
+\strut\end{minipage} &
+\begin{minipage}[t]{0.18\columnwidth}\raggedleft\strut
+2545
+\strut\end{minipage} &
+\begin{minipage}[t]{0.23\columnwidth}\raggedleft\strut
+42
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.12\columnwidth}\raggedleft\strut
+6400
+\strut\end{minipage} &
+\begin{minipage}[t]{0.16\columnwidth}\raggedleft\strut
+1520
+\strut\end{minipage} &
+\begin{minipage}[t]{0.17\columnwidth}\raggedleft\strut
+5
+\strut\end{minipage} &
+\begin{minipage}[t]{0.18\columnwidth}\raggedleft\strut
+1002
+\strut\end{minipage} &
+\begin{minipage}[t]{0.23\columnwidth}\raggedleft\strut
+38
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.12\columnwidth}\raggedleft\strut
+12800
+\strut\end{minipage} &
+\begin{minipage}[t]{0.16\columnwidth}\raggedleft\strut
+1280
+\strut\end{minipage} &
+\begin{minipage}[t]{0.17\columnwidth}\raggedleft\strut
+10
+\strut\end{minipage} &
+\begin{minipage}[t]{0.18\columnwidth}\raggedleft\strut
+439
+\strut\end{minipage} &
+\begin{minipage}[t]{0.23\columnwidth}\raggedleft\strut
+32
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.12\columnwidth}\raggedleft\strut
+25600
+\strut\end{minipage} &
+\begin{minipage}[t]{0.16\columnwidth}\raggedleft\strut
+720
+\strut\end{minipage} &
+\begin{minipage}[t]{0.17\columnwidth}\raggedleft\strut
+36
+\strut\end{minipage} &
+\begin{minipage}[t]{0.18\columnwidth}\raggedleft\strut
+105
+\strut\end{minipage} &
+\begin{minipage}[t]{0.23\columnwidth}\raggedleft\strut
+18
+\strut\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{itemize}
+\tightlist
 \item
-  Present the values of number of dancers vs maximum dancers without
-  creating claustrophobia
+  claustrophobia to mitigate: -50 = 16 turns
+\item
+  target score: 105 = 35 turns
+\item
+  50 turns for dancing per batch
+\item
+  10 turns for moving per batch
+\item
+  1800 / 60 = 30 batches can be handled
 \end{itemize}
 
 \end{frame}

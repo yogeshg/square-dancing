@@ -189,3 +189,94 @@ across categories.
 For Large category, our strategy has step behavior. Where as g7 has a
 more continuous looking behavior. We present the values of number of
 dancers vs maximum dancers without creating claustrophobia.
+
+\begin{longtable}[c]{@{}rrrrr@{}}
+\toprule
+\begin{minipage}[b]{0.12\columnwidth}\raggedleft\strut
+friends
+\strut\end{minipage} &
+\begin{minipage}[b]{0.16\columnwidth}\raggedleft\strut
+batch size
+\strut\end{minipage} &
+\begin{minipage}[b]{0.17\columnwidth}\raggedleft\strut
+num batches
+\strut\end{minipage} &
+\begin{minipage}[b]{0.18\columnwidth}\raggedleft\strut
+target score
+\strut\end{minipage} &
+\begin{minipage}[b]{0.23\columnwidth}\raggedleft\strut
+num dancing cols
+\strut\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.12\columnwidth}\raggedleft\strut
+3200
+\strut\end{minipage} &
+\begin{minipage}[t]{0.16\columnwidth}\raggedleft\strut
+1680
+\strut\end{minipage} &
+\begin{minipage}[t]{0.17\columnwidth}\raggedleft\strut
+2
+\strut\end{minipage} &
+\begin{minipage}[t]{0.18\columnwidth}\raggedleft\strut
+2545
+\strut\end{minipage} &
+\begin{minipage}[t]{0.23\columnwidth}\raggedleft\strut
+42
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.12\columnwidth}\raggedleft\strut
+6400
+\strut\end{minipage} &
+\begin{minipage}[t]{0.16\columnwidth}\raggedleft\strut
+1520
+\strut\end{minipage} &
+\begin{minipage}[t]{0.17\columnwidth}\raggedleft\strut
+5
+\strut\end{minipage} &
+\begin{minipage}[t]{0.18\columnwidth}\raggedleft\strut
+1002
+\strut\end{minipage} &
+\begin{minipage}[t]{0.23\columnwidth}\raggedleft\strut
+38
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.12\columnwidth}\raggedleft\strut
+12800
+\strut\end{minipage} &
+\begin{minipage}[t]{0.16\columnwidth}\raggedleft\strut
+1280
+\strut\end{minipage} &
+\begin{minipage}[t]{0.17\columnwidth}\raggedleft\strut
+10
+\strut\end{minipage} &
+\begin{minipage}[t]{0.18\columnwidth}\raggedleft\strut
+439
+\strut\end{minipage} &
+\begin{minipage}[t]{0.23\columnwidth}\raggedleft\strut
+32
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.12\columnwidth}\raggedleft\strut
+25600
+\strut\end{minipage} &
+\begin{minipage}[t]{0.16\columnwidth}\raggedleft\strut
+720
+\strut\end{minipage} &
+\begin{minipage}[t]{0.17\columnwidth}\raggedleft\strut
+36
+\strut\end{minipage} &
+\begin{minipage}[t]{0.18\columnwidth}\raggedleft\strut
+105
+\strut\end{minipage} &
+\begin{minipage}[t]{0.23\columnwidth}\raggedleft\strut
+18
+\strut\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Our strategy has claustrophobia because of movement. We need to mitigate
+-50 points from this claustrophobia, which is roughly 16 turns. For
+friends = 25600, out target score is 105 = 35 turns. We need 50 turns
+for dancing + 10 turns for moving per batch. This means we could only
+handle 1800 / 60 = 30 batches for this target score. If we include
+claustrophobia in out target score calculation, we could potentially
+handle the largest batch too. It is still encouraging for us to see that
+we avoided any negative score.
